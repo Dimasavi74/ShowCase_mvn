@@ -1,10 +1,10 @@
 package org.example.Commands;
 
 import org.example.Bd.BdManager;
-import org.example.Interfaces.cli.Advertisement;
-import org.example.Interfaces.cli.Exceptions.DefaultException;
-import org.example.Interfaces.cli.User;
-import org.example.Interfaces.cli.io.Outputer;
+import org.example.UserInterfaces.cli.Advertisement;
+import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.cli.User;
+import org.example.UserInterfaces.cli.io.Outputer;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;

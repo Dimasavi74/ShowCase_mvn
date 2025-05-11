@@ -1,6 +1,6 @@
 package org.example.Commands;
 
-import org.example.Interfaces.MainCycleController;
+import org.example.UserInterfaces.MainCycleController;
 
 import java.util.ArrayList;
 import java.util.HashMap;

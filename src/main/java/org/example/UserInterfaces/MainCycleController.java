@@ -1,14 +1,14 @@
-package org.example.Interfaces;
+package org.example.UserInterfaces;
 
 import org.example.Bd.BdManager;
 import org.example.Commands.Command;
-import org.example.Interfaces.cli.CommandBuilder;
-import org.example.Interfaces.cli.Exceptions.WrongInput;
-import org.example.Interfaces.cli.StandardCommandBuilder;
-import org.example.Interfaces.cli.User;
-import org.example.Interfaces.cli.io.Inputer;
-import org.example.Interfaces.cli.io.Outputer;
-import org.example.Interfaces.cli.io.Parser;
+import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.cli.CommandBuilder;
+import org.example.UserInterfaces.cli.StandardCommandBuilder;
+import org.example.UserInterfaces.cli.User;
+import org.example.UserInterfaces.cli.io.Inputer;
+import org.example.UserInterfaces.cli.io.Outputer;
+import org.example.UserInterfaces.cli.io.Parser;
 
 import java.util.HashMap;
 
@@ -39,7 +39,7 @@ public class MainCycleController {
             try {
                 Command command = builder.build(parsedCommand.get("command"), parsedCommand);
                 command.execute();
-            } catch (WrongInput e) {
+            } catch (DefaultException e) {
                 this.outputer.outputLine(e.getMessage());
             }
         }
