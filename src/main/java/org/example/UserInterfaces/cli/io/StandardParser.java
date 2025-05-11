@@ -1,6 +1,6 @@
-package org.example.Interfaces.cli.io;
+package org.example.UserInterfaces.cli.io;
 
-import org.example.Interfaces.cli.Exceptions.DefaultException;
+import org.example.Exceptions.DefaultException;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package org.example.Interfaces.cli.io;
+package org.example.UserInterfaces.cli.io;
 
 import java.util.HashMap;
 

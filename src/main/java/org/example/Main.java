@@ -1,23 +1,20 @@
 package org.example;
 
 import org.example.Bd.HeliosBdManager;
-import org.example.Commands.Help;
-import org.example.Interfaces.cli.User;
-import org.example.Interfaces.cli.io.Inputer;
-import org.example.Interfaces.MainCycleController;
-import org.example.Interfaces.cli.io.Outputer;
-import org.example.Interfaces.cli.io.Parser;
-import org.example.Interfaces.cli.io.ConsoleOutputer;
-import org.example.Interfaces.cli.io.ConsoleInputer;
-import org.example.Interfaces.cli.io.StandardParser;
+import org.example.UserInterfaces.cli.User;
+import org.example.UserInterfaces.cli.io.Inputer;
+import org.example.UserInterfaces.MainCycleController;
+import org.example.UserInterfaces.cli.io.Outputer;
+import org.example.UserInterfaces.cli.io.Parser;
+import org.example.UserInterfaces.cli.io.ConsoleOutputer;
+import org.example.UserInterfaces.cli.io.ConsoleInputer;
+import org.example.UserInterfaces.cli.io.StandardParser;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         Inputer inputer = new ConsoleInputer();
         Parser parser = new StandardParser();
         Outputer outputer = new ConsoleOutputer();

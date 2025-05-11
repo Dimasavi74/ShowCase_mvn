@@ -1,11 +1,11 @@
-package org.example.Interfaces.cli;
+package org.example.UserInterfaces.cli;
 
 import org.example.Bd.BdManager;
 import org.example.Commands.*;
-import org.example.Interfaces.cli.Exceptions.WrongInput;
-import org.example.Interfaces.cli.io.Inputer;
-import org.example.Interfaces.cli.io.Outputer;
-import org.example.Interfaces.cli.io.Parser;
+import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.cli.io.Inputer;
+import org.example.UserInterfaces.cli.io.Outputer;
+import org.example.UserInterfaces.cli.io.Parser;
 
 import java.util.HashMap;
 
@@ -56,7 +56,7 @@ public class StandardCommandBuilder implements CommandBuilder {
         if (commandObjects.containsKey(commandName)) {
             return commandObjects.get(commandName);
         } else {
-            throw new WrongInput(String.format("Команда %s не найдена. Список доступных команд /help;", commandName));
+            throw new DefaultException(String.format("Команда %s не найдена. Список доступных команд /help;", commandName));
         }
     }
 

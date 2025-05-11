@@ -1,9 +1,9 @@
-package org.example.Interfaces.cli;
+package org.example.UserInterfaces.cli;
 
 import org.example.Commands.Command;
-import org.example.Interfaces.cli.io.Inputer;
-import org.example.Interfaces.cli.io.Outputer;
-import org.example.Interfaces.cli.io.Parser;
+import org.example.UserInterfaces.cli.io.Inputer;
+import org.example.UserInterfaces.cli.io.Outputer;
+import org.example.UserInterfaces.cli.io.Parser;
 
 import java.util.HashMap;
 
