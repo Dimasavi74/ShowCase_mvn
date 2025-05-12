@@ -107,7 +107,6 @@ public class HeliosBdManager implements BdManager {
         } catch (SQLException e) {
             if (e.getSQLState().equals("23505")) {
                 throw new DefaultException("KeyAlreadyExistsError");
-//                return false;
             } else {
                 throw new DefaultException("ServerError");
             }
@@ -273,6 +272,72 @@ public class HeliosBdManager implements BdManager {
             }
             return new Advertisement(title, description, price, contacts, tags.toArray(new String[0]));
 
+        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+            throw new DefaultException("ServerError");
+        }
+    }
+
+    public boolean addFavourite(User user, int advertisementId) {
+        try {
+            if (connection.isClosed()) {
+                connect();
+            }
+            if (!login(user.nickname, user.mailAddress, user.password)) {
+                throw new DefaultException("UserDoesNotExist");
+            }
+            int userId = getUserId(user);
+            String query = "INSERT INTO PersonFavourite VALUES (?, ?);";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, userId);
+            ps.setInt(2, advertisementId);
+            ps.execute();
+            return true;
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) {
+                throw new DefaultException("KeyAlreadyExistsError");
+            } else {
+                throw new DefaultException("ServerError");
+            }
+        }
+    }
+
+    public boolean removeFavourite(User user, int advertisementId) {
+        try {
+            if (connection.isClosed()) {connect();}
+            if (!login(user.nickname, user.mailAddress, user.password)) {throw new DefaultException("UserDoesNotExist");}
+            int userId = getUserId(user);
+            String query = "DELETE FROM PersonFavourite WHERE AdvertisementId = ? AND PersonId = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, advertisementId);
+            ps.setInt(2, userId);
+            boolean result = (ps.executeUpdate() > 0);
+            if (!result) {
+                throw new DefaultException("KeyDoesNotExistError");
+            }
+            return true;
+        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+            throw new DefaultException("ServerError");
+        }
+    }
+
+    public HashMap<Integer, String> userFavourites(User user) {
+        try {
+            if (connection.isClosed()) {connect();}
+            if (!login(user.nickname, user.mailAddress, user.password)) {throw new DefaultException("UserDoesNotExist");}
+            int userId = getUserId(user);
+            String query = "SELECT * FROM (SELECT AdvertisementId FROM PersonFavourite WHERE PersonId = ?) AS PersonFavourite INNER JOIN Advertisement ON PersonFavourite.AdvertisementId = Advertisement.AdvertisementId;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, userId);
+            ResultSet result = ps.executeQuery();
+            HashMap<Integer, String> resultMap = new HashMap<>();
+            while(result.next()){
+                int advertisementId = result.getInt(1);
+                String title = result.getString(4);
+                resultMap.put(advertisementId, title);
+            }
+            return resultMap;
         } catch (SQLException e) {
 //            throw new RuntimeException(e);
             throw new DefaultException("ServerError");

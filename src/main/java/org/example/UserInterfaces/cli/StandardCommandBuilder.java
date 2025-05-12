@@ -16,8 +16,17 @@ public class StandardCommandBuilder implements CommandBuilder {
     private BdManager bdManager;
     private User user;
     private final HashMap<String, Command> commandObjects = new HashMap<>();
+    private StandardCommandBuilderSettings settings;
 
-    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, User user) {
+    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, User user, StandardCommandBuilderSettings settings) {
+
+        this.inputer = inputer;
+        this.parser = parser;
+        this.outputer = outputer;
+        this.bdManager = bdManager;
+        this.user = user;
+        this.settings = settings;
+
         commandObjects.put("help", new Help(outputer, commandObjects));
         commandObjects.put("exit", new Exit());
         commandObjects.put("getInfo", new GetInfo(outputer, commandObjects));
@@ -29,26 +38,44 @@ public class StandardCommandBuilder implements CommandBuilder {
         commandObjects.put("myAdvertisements", new MyAdvertisements(outputer, bdManager, user));
         commandObjects.put("showAdvertisement", new ShowAdvertisement(outputer, bdManager));
         commandObjects.put("search", new Search(outputer, bdManager));
+        commandObjects.put("changeMode", new ChangeMode(outputer, settings));
+        commandObjects.put("logout", new Logout(outputer, user));
+        commandObjects.put("addFavourite", new AddFavourite(outputer, bdManager, user));
+        commandObjects.put("removeFavourite", new RemoveFavourite(outputer, bdManager, user));
+        commandObjects.put("myFavourites", new MyFavourites(outputer, bdManager, user));
 
-        this.inputer = inputer;
-        this.parser = parser;
-        this.outputer = outputer;
-        this.bdManager = bdManager;
-        this.user = user;
     }
 
     public Command build(String commandName, HashMap<String, String> commandArgs) {
         Command command = getCommandObject(commandName);
         command.setData(commandArgs);
-        while (!command.checkCompleteness()) {
+        if (settings.inputMode.equals("line")) {
+            lineInput(command);
+        } else {
+            standardInput(command);
+        }
+        return command;
+    }
 
+    private void standardInput(Command command) {
+        while (!command.checkCompleteness()) {
             outputer.outputLine("Некоторые обязательные поля остались незаполненными: "
                     + String.join(" ", command.getEmptyFields()));
             String newDataLine = this.inputer.getLine();
             HashMap<String, String> parsedData = this.parser.parseLine(newDataLine);
             command.setData(parsedData);
         }
-        return command;
+    }
+
+    private void lineInput(Command command) {
+        while (!command.checkCompleteness()) {
+            outputer.outputLine("Введите обязательное поле: ");
+            outputer.outputHalfLine(command.getEmptyFields().get(0) + ": ");
+            String newDataLine = this.inputer.getLine();
+            HashMap<String, String> newData = new HashMap<>();
+            newData.put(command.getEmptyFields().get(0), newDataLine.substring(0, newDataLine.length() - 1));
+            command.setData(newData);
+        }
     }
 
 

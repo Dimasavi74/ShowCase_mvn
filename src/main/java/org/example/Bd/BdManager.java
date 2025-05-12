@@ -14,4 +14,7 @@ public interface BdManager {
     public HashMap<Integer, String> userAdvertisements(User user);
     public Advertisement showAdvertisement(int advertisementId);
     public HashMap<Integer, String> search(String[] words, String[] tags, Integer advertisementId);
+    public boolean addFavourite(User user, int advertisementId);
+    public boolean removeFavourite(User user, int advertisementId);
+    public HashMap<Integer, String> userFavourites(User user);
 }

@@ -8,14 +8,14 @@ import org.example.UserInterfaces.cli.io.Outputer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MyAdvertisements implements Command {
+public class MyFavourites implements Command {
     private Outputer outputer;
     private BdManager bdManager;
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {};
 
-    public MyAdvertisements(Outputer out, BdManager bd, User u) {
+    public MyFavourites(Outputer out, BdManager bd, User u) {
         this.outputer = out;
         this.bdManager = bd;
         this.user = u;
@@ -23,9 +23,9 @@ public class MyAdvertisements implements Command {
 
     public void execute() {
         try {
-            HashMap<Integer, String> result = bdManager.userAdvertisements(user);
+            HashMap<Integer, String> result = bdManager.userFavourites(user);
             if (result.isEmpty()) {
-                outputer.outputLine("Вы еще не создали ни одного объявления!");
+                outputer.outputLine("Вы еще не добавили ни одного объявления!");
             } else {
                 for (int id : result.keySet()) {
                     outputer.outputLine("Объявление №" + id + ": " + result.get(id));
@@ -66,7 +66,7 @@ public class MyAdvertisements implements Command {
     }
 
     public String getInfo() {
-        return "Показывает объявления текущего пользователя" + "\n"
+        return "Показывает понравившиеся объявления текущего пользователя" + "\n"
                 + "Вид: /myAdvertisements;";
     }
 }

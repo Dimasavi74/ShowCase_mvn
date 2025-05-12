@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Bd.HeliosBdManager;
+import org.example.UserInterfaces.cli.StandardCommandBuilderSettings;
 import org.example.UserInterfaces.cli.User;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.MainCycleController;
@@ -20,7 +21,9 @@ public class Main {
         Outputer outputer = new ConsoleOutputer();
         HeliosBdManager bdManager = new HeliosBdManager();
         User user = new User();
-        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, bdManager, user);
+        StandardCommandBuilderSettings settings = new StandardCommandBuilderSettings();
+        settings.inputMode = "line";
+        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, bdManager, user, settings);
         mainCycleController.mainCycle();
     }
 }

@@ -5,6 +5,7 @@ import org.example.Commands.Command;
 import org.example.Exceptions.DefaultException;
 import org.example.UserInterfaces.cli.CommandBuilder;
 import org.example.UserInterfaces.cli.StandardCommandBuilder;
+import org.example.UserInterfaces.cli.StandardCommandBuilderSettings;
 import org.example.UserInterfaces.cli.User;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.cli.io.Outputer;
@@ -19,13 +20,15 @@ public class MainCycleController {
     private Outputer outputer;
     private BdManager bdManager;
     private User user;
+    private StandardCommandBuilderSettings settings;
 
-    public MainCycleController(Inputer inp, Parser prs, Outputer out, BdManager bd, User u) {
+    public MainCycleController(Inputer inp, Parser prs, Outputer out, BdManager bd, User u, StandardCommandBuilderSettings s) {
         this.inputer = inp;
         this.parser = prs;
         this.outputer = out;
         this.bdManager = bd;
         this.user = u;
+        this.settings = s;
     }
 
     public void mainCycle() {
@@ -34,7 +37,7 @@ public class MainCycleController {
             String newCommandLine = this.inputer.getLine();
             HashMap<String, String> parsedCommand = this.parser.parseLine(newCommandLine);
 
-            CommandBuilder builder = new StandardCommandBuilder(outputer, inputer, parser, bdManager, user);
+            CommandBuilder builder = new StandardCommandBuilder(outputer, inputer, parser, bdManager, user, settings);
 
             try {
                 Command command = builder.build(parsedCommand.get("command"), parsedCommand);
