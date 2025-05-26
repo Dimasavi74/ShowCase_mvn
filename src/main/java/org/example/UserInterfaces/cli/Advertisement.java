@@ -1,4 +1,4 @@
-package org.example.Interfaces.cli;
+package org.example.UserInterfaces.cli;
 
 public class Advertisement {
     public String title;

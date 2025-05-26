@@ -1,8 +1,8 @@
 package org.example.Commands;
 
 import org.example.Bd.BdManager;
-import org.example.Interfaces.cli.Exceptions.DefaultException;
-import org.example.Interfaces.cli.io.Outputer;
+import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,9 +44,14 @@ public class Register implements Command {
             data.put("nickname", d.get("nickname"));
             nickname = d.get("nickname");
         }
-        if (d.containsKey("mailAddress") && d.get("mailAddress").contains("@")) {
-            data.put("mailAddress", d.get("mailAddress"));
-            mailAddress = d.get("mailAddress");
+        if (d.containsKey("mailAddress")) {
+            if (d.get("mailAddress").contains("@")) {
+                data.put("mailAddress", d.get("mailAddress"));
+                mailAddress = d.get("mailAddress");
+            } else {
+                data.remove(mailAddress);
+                mailAddress = null;
+            }
         }
         if (d.containsKey("password")) {
             data.put("password", d.get("password"));
@@ -75,5 +80,13 @@ public class Register implements Command {
 
     public String getInfo() {
         return "Регистрирует нового пользователя." + "\n" + "Вид: /register nickname{} mailAddress{} password{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }

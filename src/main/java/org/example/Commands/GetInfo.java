@@ -1,6 +1,6 @@
 package org.example.Commands;
 
-import org.example.Interfaces.cli.io.Outputer;
+import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,25 +28,6 @@ public class GetInfo implements Command {
         }
     }
 
-    public boolean checkCompleteness() {
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public ArrayList<String> getEmptyFields() {
-        ArrayList<String> emptyFields = new ArrayList<>();
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                emptyFields.add(el);
-            }
-        }
-        return emptyFields;
-    }
-
     public String getInfo() {
         return "Возвращает информацию о команде" + "\n" + "Вид: /getInfo commandName{};";
     }
@@ -54,4 +35,12 @@ public class GetInfo implements Command {
     public void setOutputer(Outputer out) { this.outputer = out; }
 
     public Outputer getOutputer() { return this.outputer; }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
+    }
 }

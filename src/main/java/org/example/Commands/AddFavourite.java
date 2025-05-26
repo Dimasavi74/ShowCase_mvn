@@ -3,21 +3,23 @@ package org.example.Commands;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Bd.BdManager;
 import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.cli.Advertisement;
 import org.example.UserInterfaces.cli.User;
 import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class DeleteAdvertisement implements Command {
+public class AddFavourite implements Command {
     private Outputer outputer;
     private BdManager bdManager;
     private User user;
-    private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {"advertisementId"};
+    private final HashMap<String, String> data = new HashMap<>();
     private Integer advertisementId;
 
-    public DeleteAdvertisement(Outputer out, BdManager bd, User u) {
+
+    public AddFavourite(Outputer out, BdManager bd, User u) {
         this.outputer = out;
         this.bdManager = bd;
         this.user = u;
@@ -25,18 +27,18 @@ public class DeleteAdvertisement implements Command {
 
     public void execute() {
         try {
-            if (bdManager.deleteAdvertisement(advertisementId, user)) {
-                outputer.outputLine("Объявление №" + advertisementId + " удалено!");
+            if (bdManager.addFavourite(user, advertisementId)) {
+                outputer.outputLine("Объявление №" + advertisementId + " успешно добавлено в \"Понравившееся\"");
             } else {
-                outputer.outputLine("У вас нет такого объявления! Проверьте корректность введенных данных!");
+                outputer.outputLine("Объявление не было добавлено! Проверьте корректность введенных данных и повторите попытку!");
             }
         } catch (DefaultException e) {
             if (e.getMessage().equals("ConnectionIsClosedError")) {
                 outputer.outputLine("Соединение с сервером разорвано!");
-            } else if (e.getMessage().equals("KeyDoesNotExistError")) {
-                outputer.outputLine("У вас нет такого объявления! Проверьте корректность введенных данных!\"");
             } else if (e.getMessage().equals("UserDoesNotExist")) {
                 outputer.outputLine("Вход в систему не выполнен! Войдите с помощью команды /login");
+            } else if (e.getMessage().equals("KeyAlreadyExistsError")) {
+                outputer.outputLine("Это объявление уже добавлено!");
             } else {
                 outputer.outputLine("Произошла непредвиденная ошибка! Попробуйте еще раз!");
             }
@@ -56,8 +58,8 @@ public class DeleteAdvertisement implements Command {
     }
 
     public String getInfo() {
-        return "Удаляет объявление текущего пользователя" + "\n"
-                + "Вид: /deleteAdvertisement advertisementId{};";
+        return "Добавляет объявление в список понравившихся" + "\n" +
+                "Вид: /addFavourite advertisementId{};";
     }
 
     public String[] getNesessaryKeys() {
@@ -67,4 +69,5 @@ public class DeleteAdvertisement implements Command {
     public HashMap<String, String> getData() {
         return this.data;
     }
+
 }

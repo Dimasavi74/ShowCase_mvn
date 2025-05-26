@@ -3,40 +3,42 @@ package org.example.Commands;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Bd.BdManager;
 import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.cli.Advertisement;
+import org.example.UserInterfaces.cli.User;
 import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Search implements Command{
+public class RemoveFavourite implements Command {
     private Outputer outputer;
     private BdManager bdManager;
+    private User user;
+    final String[] necessaryKeys = {"advertisementId"};
     private final HashMap<String, String> data = new HashMap<>();
-    final String[] necessaryKeys = {};
-    private String[] words = {};
-    private String[] tags = {};
-    private Integer advertisementId = 0;
+    private Integer advertisementId;
 
-    public Search(Outputer out, BdManager bd) {
+
+    public RemoveFavourite(Outputer out, BdManager bd, User u) {
         this.outputer = out;
         this.bdManager = bd;
+        this.user = u;
     }
 
     public void execute() {
         try {
-            HashMap<Integer, String> result = bdManager.search(words, tags, advertisementId);
-            if (result.isEmpty()) {
-                outputer.outputLine("По вашему запросу ничего не найдено!1");
+            if (bdManager.removeFavourite(user, advertisementId)) {
+                outputer.outputLine("Объявление №" + advertisementId + " вам больше не нравится!");
             } else {
-                for (int id : result.keySet()) {
-                    outputer.outputLine("Объявление №" + id + ": " + result.get(id));
-                }
+                outputer.outputLine("Объявление не было убрано! Проверьте корректность введенных данных и повторите попытку!");
             }
         } catch (DefaultException e) {
             if (e.getMessage().equals("ConnectionIsClosedError")) {
                 outputer.outputLine("Соединение с сервером разорвано!");
-            } else if (e.getMessage().equals("KeyDoesNotExistError")) {
-                outputer.outputLine("По вашему запросу ничего не найдено!");
+            } else if (e.getMessage().equals("UserDoesNotExist")) {
+                outputer.outputLine("Вход в систему не выполнен! Войдите с помощью команды /login");
+            } else if (e.getMessage().equals("KeyAlreadyExistsError")) {
+                outputer.outputLine("Этого объявления нет в понравившихся!");
             } else {
                 outputer.outputLine("Произошла непредвиденная ошибка! Попробуйте еще раз!");
             }
@@ -44,22 +46,6 @@ public class Search implements Command{
     }
 
     public void setData(HashMap<String, String> d) {
-        if (d.containsKey("words")) {
-            data.put("words", d.get("words"));
-            String[] rawWords = d.get("words").split(",");
-            for (int i = 0; i < rawWords.length; i++) {
-                rawWords[i] = rawWords[i].strip();
-            }
-            tags = words;
-        }
-        if (d.containsKey("tags")) {
-            data.put("tags", d.get("tags"));
-            String[] rawTags = d.get("tags").split(",");
-            for (int i = 0; i < rawTags.length; i++) {
-                rawTags[i] = rawTags[i].strip();
-            }
-            tags = rawTags;
-        }
         if (d.containsKey("advertisementId")) {
             if (NumberUtils.isCreatable(d.get("advertisementId"))) {
                 data.put("advertisementId", d.get("advertisementId"));
@@ -91,8 +77,8 @@ public class Search implements Command{
     }
 
     public String getInfo() {
-        return "Ищет объявления пользователей по содержащимся в них словах, тегах, id" + "\n"
-                + "Вид: /search words{w1, w2, ...} tags{t1, t2, ...} advertisementId{};";
+        return "Убирает объявление из списка понравившихся" + "\n" +
+                "Вид: /removeFavourite advertisementId{};";
     }
 
     public String[] getNesessaryKeys() {
