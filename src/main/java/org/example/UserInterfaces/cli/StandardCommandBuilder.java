@@ -43,6 +43,7 @@ public class StandardCommandBuilder implements CommandBuilder {
         commandObjects.put("addFavourite", new AddFavourite(outputer, bdManager, user));
         commandObjects.put("removeFavourite", new RemoveFavourite(outputer, bdManager, user));
         commandObjects.put("myFavourites", new MyFavourites(outputer, bdManager, user));
+        commandObjects.put("executeFile", new ExecuteFile(outputer, inputer, parser, this));
 
     }
 
@@ -55,6 +56,17 @@ public class StandardCommandBuilder implements CommandBuilder {
             standardInput(command);
         }
         return command;
+    }
+
+    public Command lazyBuild(String commandName, HashMap<String, String> commandArgs) {
+        Command command = getCommandObject(commandName);
+        command.setData(commandArgs);
+        if (command.checkCompleteness()) {
+            return command;
+        } else {
+            throw new DefaultException("Некоторые обязательные поля остались незаполненными: "
+                    + String.join(" ", command.getEmptyFields()));
+        }
     }
 
     private void standardInput(Command command) {

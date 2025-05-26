@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 public interface CommandBuilder {
     public Command build(String commandName, HashMap<String, String> commandArgs);
+    public Command lazyBuild(String commandName, HashMap<String, String> commandArgs);
     public Command getCommandObject(String commandName);
 
     public void setInputer(Inputer inp);

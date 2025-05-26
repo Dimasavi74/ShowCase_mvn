@@ -1,5 +1,13 @@
 package org.example.UserInterfaces.cli.io;
 
+import org.example.Exceptions.DefaultException;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class ConsoleInputer implements Inputer {
@@ -19,6 +27,23 @@ public class ConsoleInputer implements Inputer {
             line += console.nextLine();
         }
         return line;
+    }
+
+    public String[] readFile(String filePath) {
+        try {
+            Path path = Paths.get(filePath);
+            String content = Files.readString(path);
+            if (content.contains(";")) {
+                String[] lines = content.substring(0, content.lastIndexOf(";")).split(";");
+                String[] finalLines = new String[lines.length];
+                for (int i = 0; i != lines.length; i++) {finalLines[i] = lines[i] + ";";}
+                return finalLines;
+            } else {
+                return new String[]{};
+            }
+        } catch (IOException e) {
+            throw new DefaultException("Файла по данному пути не существует, либо он нечитаем. Путь: " + e.getMessage());
+        }
     }
 
     public String convertToNormalLine(String line) {
