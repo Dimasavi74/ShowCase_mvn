@@ -60,9 +60,14 @@ public class Search implements Command{
             }
             tags = rawTags;
         }
-        if (d.containsKey("advertisementId") && NumberUtils.isCreatable(d.get("advertisementId"))) {
-            data.put("advertisementId", d.get("advertisementId"));
-            advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+        if (d.containsKey("advertisementId")) {
+            if (NumberUtils.isCreatable(d.get("advertisementId"))) {
+                data.put("advertisementId", d.get("advertisementId"));
+                advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+            } else {
+                data.remove("advertisementId");
+                advertisementId = null;
+            }
         }
     }
 
@@ -88,5 +93,13 @@ public class Search implements Command{
     public String getInfo() {
         return "Ищет объявления пользователей по содержащимся в них словах, тегах, id" + "\n"
                 + "Вид: /search words{w1, w2, ...} tags{t1, t2, ...} advertisementId{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }

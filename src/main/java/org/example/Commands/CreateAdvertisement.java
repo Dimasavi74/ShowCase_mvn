@@ -18,7 +18,7 @@ public class CreateAdvertisement implements Command{
     final String[] necessaryKeys = {"title", "description", "price", "contacts"};
     private String title;
     private String description;
-    private int price;
+    private Integer price;
     private String contacts;
     private String[] tags = {};
 
@@ -61,9 +61,14 @@ public class CreateAdvertisement implements Command{
             data.put("description", d.get("description"));
             description = d.get("description");
         }
-        if (d.containsKey("price") && NumberUtils.isCreatable(d.get("price"))) {
-            data.put("price", d.get("price"));
-            price = NumberUtils.toInt(data.get("price"));
+        if (d.containsKey("price")) {
+            if (NumberUtils.isCreatable(d.get("price"))) {
+                data.put("price", d.get("price"));
+                price = NumberUtils.toInt(data.get("price"));
+            } else {
+                data.remove("price");
+                price = null;
+            }
         }
         if (d.containsKey("contacts")) {
             data.put("contacts", d.get("contacts"));
@@ -79,27 +84,16 @@ public class CreateAdvertisement implements Command{
         }
     }
 
-    public boolean checkCompleteness() {
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public ArrayList<String> getEmptyFields() {
-        ArrayList<String> emptyFields = new ArrayList<>();
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                emptyFields.add(el);
-            }
-        }
-        return emptyFields;
-    }
-
     public String getInfo() {
         return "Создает объявление от текущего пользователя" + "\n"
                 + "Вид: /createAdvertisement title{} description{} price{} contacts{} tags{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }

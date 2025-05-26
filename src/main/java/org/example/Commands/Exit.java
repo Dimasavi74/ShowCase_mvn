@@ -6,9 +6,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Exit implements Command {
+    private final HashMap<String, String> data = new HashMap<>();
+    final String[] necessaryKeys = {};
+    MainCycleController mainCycleController;
+
+    public Exit(MainCycleController mcController) {
+        this.mainCycleController = mcController;
+    }
 
     public void execute() {
-        MainCycleController.stop();
+        this.mainCycleController.stop();
     }
 
     public void setData(HashMap<String, String> data) {
@@ -25,6 +32,14 @@ public class Exit implements Command {
 
     public String getInfo() {
         return "Завершает работу программы" + "\n" + "Вид: /exit;";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 
 }

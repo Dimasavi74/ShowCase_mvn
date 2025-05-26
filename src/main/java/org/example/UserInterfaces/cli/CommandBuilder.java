@@ -1,6 +1,7 @@
 package org.example.UserInterfaces.cli;
 
 import org.example.Commands.Command;
+import org.example.Commands.CommandData;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.cli.io.Outputer;
 import org.example.UserInterfaces.cli.io.Parser;
@@ -8,8 +9,8 @@ import org.example.UserInterfaces.cli.io.Parser;
 import java.util.HashMap;
 
 public interface CommandBuilder {
-    public Command build(String commandName, HashMap<String, String> commandArgs);
-    public Command lazyBuild(String commandName, HashMap<String, String> commandArgs);
+    public Command build(CommandData commandData);
+    public Command lazyBuild(CommandData commandData);
     public Command getCommandObject(String commandName);
 
     public void setInputer(Inputer inp);

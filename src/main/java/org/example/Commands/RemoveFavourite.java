@@ -46,9 +46,14 @@ public class RemoveFavourite implements Command {
     }
 
     public void setData(HashMap<String, String> d) {
-        if (d.containsKey("advertisementId") && NumberUtils.isCreatable(d.get("advertisementId"))) {
-            data.put("advertisementId", d.get("advertisementId"));
-            advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+        if (d.containsKey("advertisementId")) {
+            if (NumberUtils.isCreatable(d.get("advertisementId"))) {
+                data.put("advertisementId", d.get("advertisementId"));
+                advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+            } else {
+                data.remove("advertisementId");
+                advertisementId = null;
+            }
         }
     }
 
@@ -74,5 +79,13 @@ public class RemoveFavourite implements Command {
     public String getInfo() {
         return "Убирает объявление из списка понравившихся" + "\n" +
                 "Вид: /removeFavourite advertisementId{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }

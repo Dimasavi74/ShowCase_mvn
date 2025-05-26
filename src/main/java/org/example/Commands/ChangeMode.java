@@ -10,6 +10,8 @@ import java.util.HashMap;
 public class ChangeMode implements Command{
     private Outputer outputer;
     private StandardCommandBuilderSettings settings;
+    private final HashMap<String, String> data = new HashMap<>();
+    final String[] necessaryKeys = {};
 
 
     public ChangeMode(Outputer out, StandardCommandBuilderSettings s) {
@@ -24,6 +26,14 @@ public class ChangeMode implements Command{
             settings.inputMode = "line";
         }
         outputer.outputLine("Режим ввода изменен на " + settings.inputMode);
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 
     public void setData(HashMap<String, String> d) {

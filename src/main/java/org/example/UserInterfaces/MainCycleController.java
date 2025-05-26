@@ -2,6 +2,7 @@ package org.example.UserInterfaces;
 
 import org.example.Bd.BdManager;
 import org.example.Commands.Command;
+import org.example.Commands.CommandData;
 import org.example.Exceptions.DefaultException;
 import org.example.UserInterfaces.cli.CommandBuilder;
 import org.example.UserInterfaces.cli.StandardCommandBuilder;
@@ -14,7 +15,7 @@ import org.example.UserInterfaces.cli.io.Parser;
 import java.util.HashMap;
 
 public class MainCycleController {
-    private static boolean run = false;
+    private boolean run = false;
     private Inputer inputer;
     private Parser parser;
     private Outputer outputer;
@@ -35,12 +36,12 @@ public class MainCycleController {
         run = true;
         while (run) {
             String newCommandLine = this.inputer.getLine();
-            HashMap<String, String> parsedCommand = this.parser.parseLine(newCommandLine);
+            CommandData parsedCommandData = this.parser.parseLine(newCommandLine);
 
-            CommandBuilder builder = new StandardCommandBuilder(outputer, inputer, parser, bdManager, user, settings);
+            CommandBuilder builder = new StandardCommandBuilder(outputer, inputer, parser, bdManager, user, settings, this);
 
             try {
-                Command command = builder.build(parsedCommand.get("command"), parsedCommand);
+                Command command = builder.build(parsedCommandData);
                 command.execute();
             } catch (DefaultException e) {
                 this.outputer.outputLine(e.getMessage());
@@ -48,12 +49,12 @@ public class MainCycleController {
         }
     }
 
-    public static void start() {
-        run = true;
+    public void start() {
+        this.run = true;
     }
 
-    public static void stop() {
-        run = false;
+    public void stop() {
+        this.run = false;
     }
 
     public void setInputer(Inputer inp) {

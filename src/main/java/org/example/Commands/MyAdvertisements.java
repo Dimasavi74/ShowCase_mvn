@@ -69,4 +69,12 @@ public class MyAdvertisements implements Command {
         return "Показывает объявления текущего пользователя" + "\n"
                 + "Вид: /myAdvertisements;";
     }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
+    }
 }

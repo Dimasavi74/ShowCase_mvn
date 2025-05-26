@@ -3,6 +3,7 @@ package org.example.UserInterfaces.cli;
 import org.example.Bd.BdManager;
 import org.example.Commands.*;
 import org.example.Exceptions.DefaultException;
+import org.example.UserInterfaces.MainCycleController;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.cli.io.Outputer;
 import org.example.UserInterfaces.cli.io.Parser;
@@ -17,8 +18,9 @@ public class StandardCommandBuilder implements CommandBuilder {
     private User user;
     private final HashMap<String, Command> commandObjects = new HashMap<>();
     private StandardCommandBuilderSettings settings;
+    private MainCycleController mainCycleController;
 
-    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, User user, StandardCommandBuilderSettings settings) {
+    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, User user, StandardCommandBuilderSettings settings, MainCycleController mcController) {
 
         this.inputer = inputer;
         this.parser = parser;
@@ -26,9 +28,10 @@ public class StandardCommandBuilder implements CommandBuilder {
         this.bdManager = bdManager;
         this.user = user;
         this.settings = settings;
+        this.mainCycleController = mcController;
 
         commandObjects.put("help", new Help(outputer, commandObjects));
-        commandObjects.put("exit", new Exit());
+        commandObjects.put("exit", new Exit(mcController));
         commandObjects.put("getInfo", new GetInfo(outputer, commandObjects));
         commandObjects.put("register", new Register(outputer, bdManager));
         commandObjects.put("login", new Login(outputer, bdManager, user));
@@ -47,9 +50,9 @@ public class StandardCommandBuilder implements CommandBuilder {
 
     }
 
-    public Command build(String commandName, HashMap<String, String> commandArgs) {
-        Command command = getCommandObject(commandName);
-        command.setData(commandArgs);
+    public Command build(CommandData commandData) {
+        Command command = getCommandObject(commandData.getCommandName());
+        command.setData(commandData.getCommandArgs());
         if (settings.inputMode.equals("line")) {
             lineInput(command);
         } else {
@@ -58,9 +61,9 @@ public class StandardCommandBuilder implements CommandBuilder {
         return command;
     }
 
-    public Command lazyBuild(String commandName, HashMap<String, String> commandArgs) {
-        Command command = getCommandObject(commandName);
-        command.setData(commandArgs);
+    public Command lazyBuild(CommandData commandData) {
+        Command command = getCommandObject(commandData.getCommandName());
+        command.setData(commandData.getCommandArgs());
         if (command.checkCompleteness()) {
             return command;
         } else {
@@ -74,8 +77,8 @@ public class StandardCommandBuilder implements CommandBuilder {
             outputer.outputLine("Некоторые обязательные поля остались незаполненными: "
                     + String.join(" ", command.getEmptyFields()));
             String newDataLine = this.inputer.getLine();
-            HashMap<String, String> parsedData = this.parser.parseLine(newDataLine);
-            command.setData(parsedData);
+            CommandData parsedData = this.parser.parseLine(newDataLine);
+            command.setData(parsedData.getCommandArgs());
         }
     }
 
@@ -94,6 +97,8 @@ public class StandardCommandBuilder implements CommandBuilder {
     public Command getCommandObject(String commandName) {
         if (commandObjects.containsKey(commandName)) {
             return commandObjects.get(commandName);
+        } else if (commandName.equals("ErrorName")) {
+            throw new DefaultException("Команда не найдена. Список доступных команд /help;");
         } else {
             throw new DefaultException(String.format("Команда %s не найдена. Список доступных команд /help;", commandName));
         }

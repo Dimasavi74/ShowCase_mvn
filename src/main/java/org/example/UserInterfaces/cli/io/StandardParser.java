@@ -1,12 +1,14 @@
 package org.example.UserInterfaces.cli.io;
 
+import org.example.Commands.CommandData;
 import org.example.Exceptions.DefaultException;
 
 import java.util.HashMap;
 
 public class StandardParser implements Parser {
-    public HashMap<String, String> parseLine(String line) {
-        HashMap<String, String> map = new HashMap<>();
+    public CommandData parseLine(String line) {
+//      Парсинг строки формата /commandName commandArg1{data} commandArg2{data} ... ;
+        CommandData commandData = new CommandData();
 
         if (line.charAt(line.length() - 1) != ';') {
             throw new DefaultException("");
@@ -14,37 +16,39 @@ public class StandardParser implements Parser {
 
         // Получение команды
         if (line.charAt(0) == '/') {
-            String commandName = "";
+            StringBuilder commandName = new StringBuilder();
             for (int i = 1; i < line.length(); i++) {
                 char c = line.charAt(i);
                 if ((c != ' ') & (c != ';')) {
-                    commandName += c;
+                    commandName.append(c);
                 } else {
                     line = line.substring(i);
                     break;
                 }
             }
-            map.put("command", commandName);
+            commandData.setCommandName(String.valueOf(commandName));
         }
 
+        HashMap<String, String> map = new HashMap<>();
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             if (c == '{') {
                 String[] all_keys = line.substring(0, i).split(" ");
                 String keyName = all_keys[all_keys.length - 1].strip();
-                String value = "";
+                StringBuilder value = new StringBuilder();
                 i++;
                 c = line.charAt(i);
                 while ((c != '}') & (c != ';')) {
-                    value += c;
+                    value.append(c);
                     i++;
                     c = line.charAt(i);
                 }
-                map.put(keyName, value);
+                map.put(keyName, String.valueOf(value));
                 line = line.substring(i + 1);
                 i = 0;
             }
         }
-        return map;
+        commandData.setCommandArgs(map);
+        return commandData;
     }
 }

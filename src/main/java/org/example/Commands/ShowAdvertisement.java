@@ -15,7 +15,7 @@ public class ShowAdvertisement implements Command {
     private BdManager bdManager;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {"advertisementId"};
-    private int advertisementId;
+    private Integer advertisementId;
 
 
     public ShowAdvertisement(Outputer out, BdManager bd) {
@@ -44,9 +44,14 @@ public class ShowAdvertisement implements Command {
     }
 
     public void setData(HashMap<String, String> d) {
-        if (d.containsKey("advertisementId") && NumberUtils.isCreatable(d.get("advertisementId"))) {
-            data.put("advertisementId", d.get("advertisementId"));
-            advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+        if (d.containsKey("advertisementId")) {
+            if (NumberUtils.isCreatable(d.get("advertisementId"))) {
+                data.put("advertisementId", d.get("advertisementId"));
+                advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+            } else {
+                data.remove("advertisementId");
+                advertisementId = null;
+            }
         }
     }
 
@@ -72,5 +77,13 @@ public class ShowAdvertisement implements Command {
     public String getInfo() {
         return "Показывает развернутую информацию об объявлении" + "\n"
                 + "Вид: /showAdvertisement advertisementId{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }

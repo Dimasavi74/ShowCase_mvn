@@ -15,7 +15,7 @@ public class DeleteAdvertisement implements Command {
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {"advertisementId"};
-    private int advertisementId;
+    private Integer advertisementId;
 
     public DeleteAdvertisement(Outputer out, BdManager bd, User u) {
         this.outputer = out;
@@ -44,33 +44,27 @@ public class DeleteAdvertisement implements Command {
     }
 
     public void setData(HashMap<String, String> d) {
-        if (d.containsKey("advertisementId") && NumberUtils.isCreatable(d.get("advertisementId"))) {
-            data.put("advertisementId", d.get("advertisementId"));
-            advertisementId = NumberUtils.toInt(data.get("advertisementId"));
-        }
-    }
-
-    public boolean checkCompleteness() {
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                return false;
+        if (d.containsKey("advertisementId")) {
+            if (NumberUtils.isCreatable(d.get("advertisementId"))) {
+                data.put("advertisementId", d.get("advertisementId"));
+                advertisementId = NumberUtils.toInt(data.get("advertisementId"));
+            } else {
+                data.remove("advertisementId");
+                advertisementId = null;
             }
         }
-        return true;
-    }
-
-    public ArrayList<String> getEmptyFields() {
-        ArrayList<String> emptyFields = new ArrayList<>();
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                emptyFields.add(el);
-            }
-        }
-        return emptyFields;
     }
 
     public String getInfo() {
         return "Удаляет объявление текущего пользователя" + "\n"
                 + "Вид: /deleteAdvertisement advertisementId{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }

@@ -8,6 +8,8 @@ import java.util.HashMap;
 public class Help implements Command {
     private Outputer outputer;
     private HashMap<String, Command> commands;
+    private final HashMap<String, String> data = new HashMap<>();
+    final String[] necessaryKeys = {};
 
     public Help(Outputer outputer, HashMap<String, Command> commands) {
         this.outputer = outputer;
@@ -37,4 +39,12 @@ public class Help implements Command {
     public void setOutputer(Outputer out) { this.outputer = out; }
 
     public Outputer getOutputer() { return this.outputer; }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
+    }
 }

@@ -29,16 +29,16 @@ public class ExecuteFile implements Command {
 
     public void execute() {
         for (String line: this.inputer.readFile(this.filePath)) {
-            HashMap<String, String> parsedCommand = this.parser.parseLine(line);
+            CommandData parsedCommandData = this.parser.parseLine(line);
             try {
-                Command command = this.commandBuilder.lazyBuild(parsedCommand.get("command"), parsedCommand);
+                Command command = this.commandBuilder.lazyBuild(parsedCommandData);
                 if (command.getClass() == ExecuteFile.class) {
-                    throw new DefaultException("Файл не должен содержать команду " + parsedCommand.get("command"));
+                    throw new DefaultException("Файл не должен содержать команду " + parsedCommandData.getCommandName());
                 }
                 command.execute();
             } catch (DefaultException e) {
                 this.outputer.outputLine(e.getMessage());
-                this.outputer.outputLine("Команда " + parsedCommand.get("command") + " пропущена!");
+                this.outputer.outputLine("Команда " + parsedCommandData.getCommandName() + " пропущена!");
             }
         }
     }
@@ -49,31 +49,24 @@ public class ExecuteFile implements Command {
             if (file.canRead()) {
                 data.put("filePath", d.get("filePath"));
                 filePath = d.get("filePath");
+            } else {
+                data.remove("filePath");
+                filePath = null;
             }
         }
     }
 
-    public boolean checkCompleteness() {
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public ArrayList<String> getEmptyFields() {
-        ArrayList<String> emptyFields = new ArrayList<>();
-        for (String el: necessaryKeys) {
-            if (data.get(el) == null) {
-                emptyFields.add(el);
-            }
-        }
-        return emptyFields;
-    }
 
     public String getInfo() {
         return "Принимает путь до файла и исполняет команды в нем. Файл не должен содержать команду executeFile," +
                 " иначе она будет пропущена" + "\n" + "Вид: /executeFile filePath{};";
+    }
+
+    public String[] getNesessaryKeys() {
+        return this.necessaryKeys;
+    }
+
+    public HashMap<String, String> getData() {
+        return this.data;
     }
 }
