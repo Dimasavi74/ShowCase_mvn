@@ -27,7 +27,9 @@ public class HeliosBdManager implements BdManager {
 
         url = "jdbc:postgresql://localhost:5432/studs";
         info = new Properties();
-        File file = new File("src/main/java/org/example/Bd/db.cfg");
+//        File file = new File("src/main/java/org/example/Bd/db.cfg");
+
+        File file = new File("C:\\Users\\Dimasavi74\\IdeaProjects\\ShowCase_mvn\\src\\main\\java\\org\\example\\Bd\\db.cfg");
         info.load(new FileInputStream(file));
         connect();
     }
