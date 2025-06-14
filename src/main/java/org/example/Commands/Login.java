@@ -1,8 +1,10 @@
 package org.example.Commands;
 
 import org.example.Bd.BdManager;
+import org.example.Common.ServerCommands.ServerLogin;
 import org.example.Exceptions.DefaultException;
 import org.example.Common.User;
+import org.example.UserInterfaces.cli.io.Communicator;
 import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 public class Login implements Command{
     private Outputer outputer;
     private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     final String[] necessaryKeys = {"nickname", "mailAddress", "password"};
     private final HashMap<String, String> data = new HashMap<>();
@@ -18,10 +21,11 @@ public class Login implements Command{
     private String mailAddress;
     private String password;
 
-    public Login(Outputer out, BdManager bd, User u) {
+    public Login(Outputer out, BdManager bd, Communicator com, User u) {
         outputer = out;
         bdManager = bd;
         user = u;
+        communicator = com;
     }
 
     public void execute() {

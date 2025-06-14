@@ -1,17 +1,18 @@
 package org.example;
 
 import org.example.Bd.HeliosBdManager;
+import org.example.Server.ServerMain;
 import org.example.UserInterfaces.cli.StandardCommandBuilderSettings;
 import org.example.Common.User;
-import org.example.UserInterfaces.cli.io.Inputer;
+import org.example.UserInterfaces.cli.io.*;
 import org.example.UserInterfaces.MainCycleController;
-import org.example.UserInterfaces.cli.io.Outputer;
-import org.example.UserInterfaces.cli.io.Parser;
-import org.example.UserInterfaces.cli.io.ConsoleOutputer;
-import org.example.UserInterfaces.cli.io.ConsoleInputer;
-import org.example.UserInterfaces.cli.io.StandardParser;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Array;
 import java.sql.SQLException;
 
 public class Main {
@@ -20,10 +21,11 @@ public class Main {
         Parser parser = new StandardParser();
         Outputer outputer = new ConsoleOutputer();
         HeliosBdManager bdManager = new HeliosBdManager();
+        Communicator communicator = new HeliosCommunicator("helios.cs.ifmo.ru", 5432);
         User user = new User();
         StandardCommandBuilderSettings settings = new StandardCommandBuilderSettings();
-        settings.inputMode = "line";
-        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, bdManager, user, settings);
+        settings.inputMode = "default";
+        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, bdManager, communicator, user, settings);
         mainCycleController.mainCycle();
     }
 }

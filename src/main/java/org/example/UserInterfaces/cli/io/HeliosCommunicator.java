@@ -1,12 +1,12 @@
 package org.example.UserInterfaces.cli.io;
 
-import org.example.Common.ServerCommandData.ServerCommandData;
 import org.example.Common.ServerCommands.ServerCommand;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class HeliosCommunicator implements Communicator {
@@ -15,16 +15,18 @@ public class HeliosCommunicator implements Communicator {
     int port;
 
 
-    public HeliosCommunicator(InetAddress host, int port) throws IOException {
+    public HeliosCommunicator(String host, int port) throws IOException {
         this.socket = new Socket(host, port);
         this.socket.setSoTimeout(10000);
     }
 
-    public ServerCommandData executeCommand(ServerCommand command) {
+    public ServerCommand executeCommand(ServerCommand command) {
         try {
+            ServerSocket serv = new ServerSocket(port);
+            socket = serv.accept();
             sendCommand(command);
             ServerCommand newCommand = getCommand();
-            return newCommand.getData();
+            return newCommand;
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -36,6 +38,7 @@ public class HeliosCommunicator implements Communicator {
     }
 
     private ServerCommand getCommand() throws IOException, ClassNotFoundException {
+        System.out.print(this.socket.getInputStream());
         ObjectInputStream os = new ObjectInputStream(this.socket.getInputStream());
         return (ServerCommand) os.readObject();
     }

@@ -64,7 +64,7 @@ public class Request implements Runnable {
              data.command = command;
              command.setBdManager(new HeliosBdManager());
              command.execute();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | InterruptedException e) {
             throw new RuntimeException(e);
         }
 

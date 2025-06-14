@@ -8,6 +8,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
 
@@ -25,12 +28,15 @@ public class HeliosBdManager implements BdManager {
 //        ssh -L 5432:pg:5432 -p 2222 s467318@se.ifmo.ru
 
 
+
         url = "jdbc:postgresql://localhost:5432/studs";
         info = new Properties();
 //        File file = new File("src/main/java/org/example/Bd/db.cfg");
 
-        File file = new File("C:\\Users\\Dimasavi74\\IdeaProjects\\ShowCase_mvn\\src\\main\\java\\org\\example\\Bd\\db.cfg");
+//        File file = new File("C:\\Users\\Dimasavi74\\IdeaProjects\\ShowCase_mvn\\src\\main\\java\\org\\example\\Bd\\db.cfg");
+        File file = new File("src/main/java/org/example/Bd/db.cfg");
         info.load(new FileInputStream(file));
+
         connect();
     }
 
@@ -183,6 +189,45 @@ public class HeliosBdManager implements BdManager {
             results.next();
             int advertisementId = results.getInt(1);
 
+            query = "INSERT INTO WordToAdvertisement VALUES (?, ?);";
+            ps = connection.prepareStatement(query);
+
+            Path path = Paths.get("src/main/java/org/example/Bd/words.txt");
+            String[] words = Files.readString(path).split("\n");
+            for (int i=0; i < words.length; i++) {
+                words[i] = words[i].strip();
+            }
+            String[] adWords = String.join(" ", Arrays.asList((advertisement.title + " " + advertisement.description).split("\n"))).split(" ");
+            boolean flag = false;
+            for (String el: adWords) {
+                if (Arrays.asList(words).contains(el.toLowerCase())) {
+                    flag = true;
+                    ps.setString(1, el.toLowerCase());
+                    ps.setInt(2, advertisementId);
+                    try {
+                        ps.execute();
+                    } catch (SQLException e) {
+                        if (e.getSQLState().equals("23505")) {
+                        } else {
+                            throw new DefaultException("ServerError");
+                        }
+                    }
+                }
+
+            }
+            if (!flag) {
+                ps.setString(1, "extra");
+                ps.setInt(2, advertisementId);
+                try {
+                    ps.execute();
+                } catch (SQLException e) {
+                    if (e.getSQLState().equals("23505")) {
+                    } else {
+                        throw new DefaultException("ServerError");
+                    }
+                }
+            }
+
             query = "INSERT INTO AdvertisementTags VALUES (?, ?);";
             ps = connection.prepareStatement(query);
             for (String tag: advertisement.tags) {
@@ -205,6 +250,8 @@ public class HeliosBdManager implements BdManager {
             } else {
                 throw new DefaultException("ServerError");
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

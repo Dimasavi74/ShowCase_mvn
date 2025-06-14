@@ -5,6 +5,7 @@ import org.example.Commands.*;
 import org.example.Common.User;
 import org.example.Exceptions.DefaultException;
 import org.example.UserInterfaces.MainCycleController;
+import org.example.UserInterfaces.cli.io.Communicator;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.cli.io.Outputer;
 import org.example.UserInterfaces.cli.io.Parser;
@@ -16,17 +17,19 @@ public class StandardCommandBuilder implements CommandBuilder {
     private Parser parser;
     private Outputer outputer;
     private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     private final HashMap<String, Command> commandObjects = new HashMap<>();
     private StandardCommandBuilderSettings settings;
     private MainCycleController mainCycleController;
 
-    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, User user, StandardCommandBuilderSettings settings, MainCycleController mcController) {
+    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, Communicator communicator, User user, StandardCommandBuilderSettings settings, MainCycleController mcController) {
 
         this.inputer = inputer;
         this.parser = parser;
         this.outputer = outputer;
         this.bdManager = bdManager;
+        this.communicator = communicator;
         this.user = user;
         this.settings = settings;
         this.mainCycleController = mcController;
@@ -35,7 +38,7 @@ public class StandardCommandBuilder implements CommandBuilder {
         commandObjects.put("exit", new Exit(mcController));
         commandObjects.put("getInfo", new GetInfo(outputer, commandObjects));
         commandObjects.put("register", new Register(outputer, bdManager));
-        commandObjects.put("login", new Login(outputer, bdManager, user));
+        commandObjects.put("login", new Login(outputer, bdManager,communicator, user));
         commandObjects.put("deleteUser", new DeleteUser(outputer, bdManager));
         commandObjects.put("createAdvertisement", new CreateAdvertisement(outputer, bdManager, user));
         commandObjects.put("deleteAdvertisement", new DeleteAdvertisement(outputer, bdManager, user));
