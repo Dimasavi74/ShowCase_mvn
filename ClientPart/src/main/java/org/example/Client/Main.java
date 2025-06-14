@@ -1,0 +1,25 @@
+package org.example.Client;
+
+import org.example.Client.UserInterfaces.cli.StandardCommandBuilderSettings;
+import org.example.Client.UserInterfaces.cli.io.*;
+import org.example.Client.UserInterfaces.MainCycleController;
+import org.example.Common.Bd.HeliosBdManager;
+import org.example.Common.User;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+public class Main {
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+        Inputer inputer = new ConsoleInputer();
+        Parser parser = new StandardParser();
+        Outputer outputer = new ConsoleOutputer();
+        HeliosBdManager bdManager = new HeliosBdManager();
+        HeliosCommunicator communicator = new HeliosCommunicator("localhost", 5432);
+        User user = new User();
+        StandardCommandBuilderSettings settings = new StandardCommandBuilderSettings();
+        settings.inputMode = "default";
+        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, bdManager, communicator, user, settings);
+        mainCycleController.mainCycle();
+    }
+}

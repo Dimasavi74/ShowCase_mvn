@@ -3,26 +3,22 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.example</groupId>
-  <artifactId>ShowCase_mvn</artifactId>
+  <artifactId>ShowCase_mvn_server</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
 
-
-  <name>ShowCase_mvn</name>
+  <name>ShowCase_mvn_server</name>
   <url>http://maven.apache.org</url>
-
-  <modules>
-    <module>ClientPart</module>
-    <module>Common</module>
-    <module>ServerPart</module>
-  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-
+    <dependency>
+      <groupId>org.example</groupId>
+      <artifactId>ShowCase_mvn_common</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -57,6 +53,11 @@
         <version>3.4.1</version>
         <configuration>
           <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+<!--              <classpathPrefix>lib/</classpathPrefix>-->
+              <mainClass>org.example.Server.ServerMain</mainClass>
+            </manifest>
           </archive>
         </configuration>
       </plugin>
