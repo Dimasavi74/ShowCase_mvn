@@ -7,12 +7,10 @@ import org.example.Exceptions.DefaultException;
 import org.example.UserInterfaces.cli.CommandBuilder;
 import org.example.UserInterfaces.cli.StandardCommandBuilder;
 import org.example.UserInterfaces.cli.StandardCommandBuilderSettings;
-import org.example.UserInterfaces.cli.User;
+import org.example.Common.User;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.cli.io.Outputer;
 import org.example.UserInterfaces.cli.io.Parser;
-
-import java.util.HashMap;
 
 public class MainCycleController {
     private boolean run = false;

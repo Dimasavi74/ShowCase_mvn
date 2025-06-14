@@ -1,13 +1,12 @@
 package org.example.Commands;
 
 import org.example.Bd.BdManager;
-import org.example.UserInterfaces.cli.Advertisement;
+import org.example.Common.Advertisement;
 import org.example.Exceptions.DefaultException;
-import org.example.UserInterfaces.cli.User;
+import org.example.Common.User;
 import org.example.UserInterfaces.cli.io.Outputer;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CreateAdvertisement implements Command{
@@ -15,7 +14,7 @@ public class CreateAdvertisement implements Command{
     private BdManager bdManager;
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
-    final String[] necessaryKeys = {"title", "description", "price", "contacts"};
+    final String[] necessaryKeys = {"title", "description", "price", "contacts", "tags"};
     private String title;
     private String description;
     private Integer price;

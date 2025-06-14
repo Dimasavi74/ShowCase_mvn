@@ -1,7 +1,7 @@
 package org.example.Bd;
 
-import org.example.UserInterfaces.cli.Advertisement;
-import org.example.UserInterfaces.cli.User;
+import org.example.Common.Advertisement;
+import org.example.Common.User;
 
 import java.util.HashMap;
 

@@ -1,6 +1,8 @@
-package org.example.UserInterfaces.cli;
+package org.example.Common;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     public String nickname;
     public String mailAddress;
     public String password;

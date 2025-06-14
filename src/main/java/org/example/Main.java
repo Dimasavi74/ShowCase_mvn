@@ -2,7 +2,7 @@ package org.example;
 
 import org.example.Bd.HeliosBdManager;
 import org.example.UserInterfaces.cli.StandardCommandBuilderSettings;
-import org.example.UserInterfaces.cli.User;
+import org.example.Common.User;
 import org.example.UserInterfaces.cli.io.Inputer;
 import org.example.UserInterfaces.MainCycleController;
 import org.example.UserInterfaces.cli.io.Outputer;
@@ -11,10 +11,8 @@ import org.example.UserInterfaces.cli.io.ConsoleOutputer;
 import org.example.UserInterfaces.cli.io.ConsoleInputer;
 import org.example.UserInterfaces.cli.io.StandardParser;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {

@@ -1,6 +1,6 @@
 package org.example.Commands;
 
-import org.example.UserInterfaces.cli.User;
+import org.example.Common.User;
 import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;

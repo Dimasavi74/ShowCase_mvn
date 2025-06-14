@@ -3,8 +3,7 @@ package org.example.Commands;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Bd.BdManager;
 import org.example.Exceptions.DefaultException;
-import org.example.UserInterfaces.cli.Advertisement;
-import org.example.UserInterfaces.cli.User;
+import org.example.Common.User;
 import org.example.UserInterfaces.cli.io.Outputer;
 
 import java.util.ArrayList;

@@ -2,6 +2,7 @@ package org.example.UserInterfaces.cli;
 
 import org.example.Bd.BdManager;
 import org.example.Commands.*;
+import org.example.Common.User;
 import org.example.Exceptions.DefaultException;
 import org.example.UserInterfaces.MainCycleController;
 import org.example.UserInterfaces.cli.io.Inputer;

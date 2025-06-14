@@ -1,6 +1,8 @@
-package org.example.UserInterfaces.cli;
+package org.example.Common;
 
-public class Advertisement {
+import java.io.Serializable;
+
+public class Advertisement implements Serializable {
     public String title;
     public String description;
     public Integer price;

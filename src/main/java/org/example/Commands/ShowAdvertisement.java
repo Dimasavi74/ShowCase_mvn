@@ -2,7 +2,7 @@ package org.example.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Bd.BdManager;
-import org.example.UserInterfaces.cli.Advertisement;
+import org.example.Common.Advertisement;
 import org.example.Exceptions.DefaultException;
 import org.example.UserInterfaces.cli.io.Outputer;
 
