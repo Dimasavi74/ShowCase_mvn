@@ -1,6 +1,7 @@
 package org.example.Server;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -20,6 +21,7 @@ public class StandartServerCommunicator implements ServerCommunicator {
             selector = Selector.open();
             server = ServerSocketChannel.open();
             server.configureBlocking(false);
+            server.bind(new InetSocketAddress(5432));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
