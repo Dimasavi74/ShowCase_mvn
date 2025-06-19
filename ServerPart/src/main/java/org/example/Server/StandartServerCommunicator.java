@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 public class StandartServerCommunicator implements ServerCommunicator {
@@ -21,7 +22,11 @@ public class StandartServerCommunicator implements ServerCommunicator {
             selector = Selector.open();
             server = ServerSocketChannel.open();
             server.configureBlocking(false);
-            server.bind(new InetSocketAddress(54321));
+            Scanner console = new Scanner(System.in);
+            System.out.print("Введите порт: ");
+            String line = console.nextLine();
+            server.bind(new InetSocketAddress(Integer.parseInt(line)));
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

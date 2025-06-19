@@ -7,7 +7,6 @@ import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Common.ServerCommands.ServerSearch;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Search implements Command{

@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class ServerDeleteAdvertisement implements ServerCommand, Serializable {
     private transient BdManager bdManager;
-    public DefaultException error;
+    public DefaultException error = new DefaultException("");
     public boolean isAdvertisementDeleted;
     private Integer advertisementId;
     User user;
