@@ -35,6 +35,7 @@ public class Search implements Command{
                 }
             }
         } catch (DefaultException e) {
+            if (e == null) {}
             if (e.getMessage().equals("ConnectionIsClosedError")) {
                 outputer.outputLine("Соединение с сервером разорвано!");
             } else if (e.getMessage().equals("KeyDoesNotExistError")) {

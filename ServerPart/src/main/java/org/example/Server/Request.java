@@ -7,9 +7,11 @@ import org.example.Common.ServerCommands.ServerCommand;
 import org.example.Common.ServerCommands.ServerEmptyCommand;
 
 import java.io.*;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.TreeMap;
 
 import static java.nio.channels.SelectionKey.*;
 
@@ -37,13 +39,7 @@ public class Request implements Runnable {
                 }
             }
         } catch (IOException exception) {
-//            var data = (ClientData) key.attachment();
-//            data.isError = true;
-//            data.errorMessage = "Ошибка выполнения запроса" + exception.getMessage();
-//            key.attach(data);
-//            data.command.setError(exception.getMessage());
-//            throw new RuntimeException(exception);
-            throw new DefaultException(exception.getMessage());
+            throw new RuntimeException(exception);
         } catch (InterruptedException e) {
             throw new DefaultException(e.getMessage());
         }
@@ -51,32 +47,59 @@ public class Request implements Runnable {
     }
 
     public void doAccept() throws IOException {
+        System.out.println("Выполняется accept запроса " + reqNumber);
+        System.out.println("Ключ: " + key);
         var ssc = (ServerSocketChannel) key.channel();
-        var sc = ssc.accept();
+        System.out.println("Канал: " + ssc);
+        SocketChannel sc;
+        try {
+            sc = ssc.accept();
+        } catch (IOException e) {
+            System.out.println("Подключение не удалось!");
+            throw new RuntimeException(e);
+        }
+        System.out.println("Подключение удалось!");
+        System.out.println("Устанавливаем неблокирующмй режим");
         sc.configureBlocking(false);
-        SelectionKey clientKey = sc.register(key.selector(), OP_READ);
+        SelectionKey clientKey = null;
+        try {
+            System.out.println("Устанавливаем неблокирующмй режим");
+            clientKey = sc.register(key.selector(), OP_READ);
+        } catch (ClosedChannelException exception) {
+            System.out.println("Канал закрыт, регистрация ключа на чтение невозможна! Канал: " + sc);
+            throw new RuntimeException(exception);
+        }
+        System.out.println("Ключ на чтение зарегистрирован!: " + clientKey);
         clientKey.attach(new ClientData());
     }
 
     public void doRead() throws IOException, InterruptedException {
+        System.out.println("Выполняется чтение запроса " + reqNumber);
+        System.out.println("Ключ: " + key);
         SocketChannel sc = (SocketChannel) key.channel();
+        System.out.println("Канал: " + sc);
         sc.configureBlocking(false);
         ClientData data = (ClientData) key.attachment();
-        System.out.println(sc);
+        System.out.println("Привязаный объект: " + data);
         ChannelWrapper wrapper = new ChannelWrapper(sc);
         try {
+            System.out.println("Читаем объект");
             data.command = (ServerCommand) wrapper.readObject();
+            System.out.println("Назначаем бд-менеджер");
+            data.command.setBdManager(new HeliosBdManager());
+            System.out.println("Исполняем команду");
+            data.command.execute();
+            if (data.command.getError() != "") {
+                System.out.println("Команда выполнена с ошибкой: " + data.command.getError());
+                data.isError = true;
+                data.errorMessage = data.command.getError();
+            } else {
+                System.out.println("Команда выполнена успешно!");
+            }
         } catch (ClassNotFoundException e) {
+            System.out.println("Объект такого класа не найден");
             data.isError = true;
             data.errorMessage = "SerializationError";
-        }
-        System.out.println(data.command);
-        data.command.setBdManager(new HeliosBdManager());
-        try {
-            data.command.execute();
-        } catch (DefaultException e) {
-            data.isError = true;
-            data.errorMessage = "SQLError";
         }
         SelectionKey clientKey = sc.register(key.selector(), OP_WRITE);
         clientKey.attach(data);

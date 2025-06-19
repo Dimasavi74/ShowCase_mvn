@@ -26,6 +26,7 @@ public class StandartServerCommunicator implements ServerCommunicator {
             System.out.print("Введите порт: ");
             String line = console.nextLine();
             server.bind(new InetSocketAddress(Integer.parseInt(line)));
+            System.out.println("Сервер открыт?" + server.isOpen());
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -33,6 +34,7 @@ public class StandartServerCommunicator implements ServerCommunicator {
         try {
             server.register(selector, SelectionKey.OP_ACCEPT);
         } catch (ClosedChannelException e) {
+            System.out.println("Канал для регистрации accept закрыт!");
             throw new RuntimeException(e);
         }
     }
@@ -41,15 +43,18 @@ public class StandartServerCommunicator implements ServerCommunicator {
         try {
             selector.select();
         } catch (IOException e) {
+            System.out.println("Select не удался!");
             throw new RuntimeException(e);
         }
         Set<SelectionKey> keys = selector.selectedKeys();
+        System.out.println("Эти ключи нашел селектор:");
         Set<Request> requests = new HashSet<>();
         for (var iter = keys.iterator(); iter.hasNext(); ) {
             SelectionKey key = iter.next();
-            System.out.println(key);
+            System.out.println(key + " isAcceptable: " + key.isAcceptable() + " isReadable: " + key.isReadable() + " isWriteable: " + key.isWritable());
             iter.remove();
             Request request = new Request(counter++, key);
+            System.out.println("Создан новый Request " + (counter - 1));
             requests.add(request);
         }
         return requests;
