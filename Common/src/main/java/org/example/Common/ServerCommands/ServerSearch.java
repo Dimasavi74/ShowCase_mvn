@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class ServerSearch implements ServerCommand, Serializable {
     private transient BdManager bdManager;
-    public DefaultException error;
+    public DefaultException error = new DefaultException("");
     public HashMap<Integer, String> searchResult;
     private String[] words = {};
     private String[] tags = {};

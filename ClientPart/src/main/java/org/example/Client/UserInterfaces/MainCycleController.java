@@ -43,7 +43,8 @@ public class MainCycleController {
                 Command command = builder.build(parsedCommandData);
                 command.execute();
             } catch (DefaultException e) {
-                this.outputer.outputLine(e.getMessage());
+
+//                this.outputer.outputLine(e.getMessage());
             }
         }
     }

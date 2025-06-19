@@ -5,6 +5,7 @@ import org.postgresql.util.ServerErrorMessage;
 
 public class ServerEmptyCommand implements ServerCommand {
     private String errorMessage;
+    private String error;
 
     public void execute() {
 
