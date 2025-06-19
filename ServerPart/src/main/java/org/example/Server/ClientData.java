@@ -6,7 +6,8 @@ import java.nio.ByteBuffer;
 
 public class ClientData {
     public ServerCommand command;
-    public ByteBuffer buffer = ByteBuffer.allocate(10000);
+    public ByteBuffer bodyBuffer = ByteBuffer.allocate(1024 * 16);
+    public ReadState state = ReadState.HEADER;
     boolean isError = false;
     String errorMessage;
 }

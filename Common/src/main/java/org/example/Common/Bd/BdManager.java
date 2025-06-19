@@ -3,9 +3,10 @@ package org.example.Common.Bd;
 import org.example.Common.Advertisement;
 import org.example.Common.User;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public interface BdManager {
+public interface BdManager extends Serializable {
     public boolean register(String nickname, String mailAddress, String password);
     public boolean login(String nickname, String mailAddress, String password);
     public boolean deleteUser(String nickname, String mailAddress, String password);

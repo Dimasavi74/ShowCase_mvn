@@ -6,7 +6,7 @@ import org.example.Common.Exceptions.DefaultException;
 import java.io.Serializable;
 
 public class ServerLogin implements ServerCommand, Serializable {
-    private BdManager bdManager;
+    private transient BdManager bdManager;
     public DefaultException error;
     public boolean isLogged;
     private String nickname;

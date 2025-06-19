@@ -21,7 +21,7 @@ public class StandartServerCommunicator implements ServerCommunicator {
             selector = Selector.open();
             server = ServerSocketChannel.open();
             server.configureBlocking(false);
-            server.bind(new InetSocketAddress(5432));
+            server.bind(new InetSocketAddress(54321));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -33,19 +33,27 @@ public class StandartServerCommunicator implements ServerCommunicator {
     }
 
     public Set<Request> getRequests(){
-        try {
-            selector.select();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        var sc = (SocketChannel) key.channel();
+        var data = (ClientData) key.attachment();
+
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream os = new ObjectOutputStream(bos)) {
+
+            os.writeObject(data.command);
+            os.flush(); // Важно!
+
+            byte[] bytes = bos.toByteArray();
+            ByteBuffer outputBuffer = ByteBuffer.allocate(bytes.length);
+            outputBuffer.put(bytes);
+            outputBuffer.flip(); // Переключаем в режим чтения
+
+            // Гарантированная отправка всех данных
+            while (outputBuffer.hasRemaining()) {
+                sc.write(outputBuffer);
+            }
+
+        } finally {
+            key.cancel();
+            sc.close(); // Закрываем после отправки
         }
-        Set<SelectionKey> keys = selector.selectedKeys();
-        Set<Request> requests = new HashSet<>();
-        for (var iter = keys.iterator(); iter.hasNext(); ) {
-            SelectionKey key = iter.next();
-            iter.remove();
-            Request request = new Request(counter++, key);
-            requests.add(request);
-        }
-        return requests;
-    }
 }

@@ -3,7 +3,7 @@ package org.example.Server;
 import java.util.concurrent.ExecutorService;
 
 public class CycleController {
-    public boolean run = false;
+    public static boolean run = false;
     ServerCommunicator communicator;
     ExecutorService executorService;
 
@@ -12,11 +12,16 @@ public class CycleController {
         this.executorService = exe;
     }
 
+    public static void stop() {
+        run = false;
+    }
+
     public void mainCycle() {
-        this.run = true;
-        while (this.run) {
+        run = true;
+        while (run) {
             for (Request request: communicator.getRequests()) {
-                executorService.execute(request);
+                request.run();
+//                executorService.execute(request);
             }
         }
     }

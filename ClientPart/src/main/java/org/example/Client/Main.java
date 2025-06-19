@@ -15,7 +15,7 @@ public class Main {
         Parser parser = new StandardParser();
         Outputer outputer = new ConsoleOutputer();
         HeliosBdManager bdManager = new HeliosBdManager();
-        HeliosCommunicator communicator = new HeliosCommunicator("localhost", 5432);
+        HeliosCommunicator communicator = new HeliosCommunicator("localhost", 54321);
         User user = new User();
         StandardCommandBuilderSettings settings = new StandardCommandBuilderSettings();
         settings.inputMode = "default";
