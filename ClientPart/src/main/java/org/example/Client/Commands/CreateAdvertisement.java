@@ -4,10 +4,8 @@ import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Common.Advertisement;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Common.ServerCommands.ServerCreateAdvertisement;
-import org.example.Common.ServerCommands.ServerRegister;
 import org.example.Common.User;
 
 import java.util.HashMap;
@@ -45,6 +43,8 @@ public class CreateAdvertisement implements Command{
                 outputer.outputLine("Соединение с сервером разорвано!");
             } else if (e.getMessage().equals("UserDoesNotExist")) {
                 outputer.outputLine("Вход в систему не выполнен! Войдите с помощью команды /login");
+            } else if (e.getMessage().equals("SQLError")) {
+                outputer.outputLine("Ошибка при работе с базой данных! Попробуйте езе раз");
             } else if (e.getMessage().equals("AdvertisementAlreadyExists")) {
                 outputer.outputLine("Такое объявление уже существует!");
             } else if (e.getMessage().equals("TagAlreadyExists")) {

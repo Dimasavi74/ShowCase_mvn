@@ -1,9 +1,7 @@
 package org.example.Client.Commands;
 
 import org.example.Client.UserInterfaces.cli.io.Communicator;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
-import org.example.Common.ServerCommands.ServerMyAdvertisements;
 import org.example.Common.ServerCommands.ServerMyFavourites;
 import org.example.Common.User;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
@@ -40,6 +38,8 @@ public class MyFavourites implements Command {
                 outputer.outputLine("Соединение с сервером разорвано!");
             } else if (e.getMessage().equals("UserDoesNotExist")) {
                 outputer.outputLine("Вход в систему не выполнен! Войдите с помощью команды /login");
+            } else if (e.getMessage().equals("SQLError")) {
+                outputer.outputLine("Ошибка при работе с базой данных! Попробуйте езе раз");
             } else {
                 outputer.outputLine("Произошла непредвиденная ошибка! Попробуйте еще раз!");
             }

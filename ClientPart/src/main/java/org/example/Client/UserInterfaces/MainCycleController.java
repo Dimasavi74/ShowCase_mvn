@@ -10,7 +10,6 @@ import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Inputer;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Client.UserInterfaces.cli.io.Parser;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Common.User;
 

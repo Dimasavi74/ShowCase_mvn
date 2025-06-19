@@ -72,7 +72,12 @@ public class Request implements Runnable {
         }
         System.out.println(data.command);
         data.command.setBdManager(new HeliosBdManager());
-        data.command.execute();
+        try {
+            data.command.execute();
+        } catch (DefaultException e) {
+            data.isError = true;
+            data.errorMessage = "SQLError";
+        }
         SelectionKey clientKey = sc.register(key.selector(), OP_WRITE);
         clientKey.attach(data);
     }

@@ -114,7 +114,7 @@ public class HeliosBdManager implements BdManager {
             return resultMap;
 
         } catch(SQLException e){
-            throw new RuntimeException(e);
+            throw new DefaultException("ServerError");
         }
     }
 
@@ -168,7 +168,6 @@ public class HeliosBdManager implements BdManager {
             }
             return true;
         } catch (SQLException e) {
-//            throw new RuntimeException(e);
             throw new DefaultException("ServerError");
         }
     }
@@ -263,7 +262,6 @@ public class HeliosBdManager implements BdManager {
             return true;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-//            throw new DefaultException("ServerError");
         }
     }
 
@@ -284,7 +282,6 @@ public class HeliosBdManager implements BdManager {
             }
             return resultMap;
         } catch (SQLException e) {
-//            throw new RuntimeException(e);
             throw new DefaultException("ServerError");
         }
     }
@@ -314,7 +311,6 @@ public class HeliosBdManager implements BdManager {
             return new Advertisement(title, description, price, contacts, tags.toArray(new String[0]));
 
         } catch (SQLException e) {
-//            throw new RuntimeException(e);
             throw new DefaultException("ServerError");
         }
     }
@@ -358,7 +354,6 @@ public class HeliosBdManager implements BdManager {
             }
             return true;
         } catch (SQLException e) {
-//            throw new RuntimeException(e);
             throw new DefaultException("ServerError");
         }
     }
@@ -380,7 +375,6 @@ public class HeliosBdManager implements BdManager {
             }
             return resultMap;
         } catch (SQLException e) {
-//            throw new RuntimeException(e);
             throw new DefaultException("ServerError");
         }
     }

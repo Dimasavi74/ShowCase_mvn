@@ -3,10 +3,8 @@ package org.example.Client.Commands;
 
 import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Common.ServerCommands.ServerDeleteUser;
-import org.example.Common.ServerCommands.ServerRegister;
 
 import java.util.HashMap;
 
@@ -36,6 +34,8 @@ public class DeleteUser implements Command{
         } catch (DefaultException e) {
             if (e.getMessage().equals("ConnectionIsClosedError")) {
                 outputer.outputLine("Соединение с сервером разорвано!");
+            } else if (e.getMessage().equals("SQLError")) {
+                outputer.outputLine("Ошибка при работе с базой данных! Попробуйте езе раз");
             } else if (e.getMessage().equals("KeyDoesNotExistError")) {
                 outputer.outputLine("Такого пользователя не существует! Проверьте корректность введенных данных!\"");
             } else {

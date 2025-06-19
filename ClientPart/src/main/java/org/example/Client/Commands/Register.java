@@ -1,11 +1,8 @@
 package org.example.Client.Commands;
 
 import org.example.Client.UserInterfaces.cli.io.Communicator;
-import org.example.Client.UserInterfaces.cli.io.HeliosCommunicator;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
-import org.example.Common.ServerCommands.ServerLogin;
 import org.example.Common.ServerCommands.ServerRegister;
 
 import java.util.ArrayList;
@@ -38,6 +35,8 @@ public class Register implements Command {
                 outputer.outputLine("Соединение с сервером разорвано!");
             } else if (e.getMessage().equals("KeyAlreadyExistsError")) {
                 outputer.outputLine("Пользователь " + nickname + " с адресом " + mailAddress + " уже существует!");
+            } else if (e.getMessage().equals("SQLError")) {
+                outputer.outputLine("Ошибка при работе с базой данных! Попробуйте езе раз");
             } else {
                 outputer.outputLine("Произошла непредвиденная ошибка! Попробуйте еще раз!");
             }

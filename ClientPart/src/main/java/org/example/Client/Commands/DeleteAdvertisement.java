@@ -3,9 +3,7 @@ package org.example.Client.Commands;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
-import org.example.Common.ServerCommands.ServerCreateAdvertisement;
 import org.example.Common.ServerCommands.ServerDeleteAdvertisement;
 import org.example.Common.User;
 
@@ -38,6 +36,8 @@ public class DeleteAdvertisement implements Command {
                 outputer.outputLine("Соединение с сервером разорвано!");
             } else if (e.getMessage().equals("KeyDoesNotExistError")) {
                 outputer.outputLine("У вас нет такого объявления! Проверьте корректность введенных данных!\"");
+            } else if (e.getMessage().equals("SQLError")) {
+                outputer.outputLine("Ошибка при работе с базой данных! Попробуйте езе раз");
             } else if (e.getMessage().equals("UserDoesNotExist")) {
                 outputer.outputLine("Вход в систему не выполнен! Войдите с помощью команды /login");
             } else {

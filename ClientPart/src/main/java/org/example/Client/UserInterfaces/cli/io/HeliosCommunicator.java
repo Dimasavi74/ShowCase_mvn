@@ -30,7 +30,7 @@ public class HeliosCommunicator implements Communicator {
             wrapper.writeObject(command);
             ServerCommand newCommand = (ServerCommand) wrapper.readObject();
             channel.close();
-            if (newCommand.getError() != null &&  newCommand.getError().equals("SerializationError")) {
+            if (newCommand.getError() != null && !newCommand.getError().equals("")) {
                 throw new DefaultException(newCommand.getError());
             }
             return newCommand;

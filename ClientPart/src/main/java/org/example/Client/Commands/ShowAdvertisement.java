@@ -2,11 +2,9 @@ package org.example.Client.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Client.UserInterfaces.cli.io.Communicator;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Advertisement;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
-import org.example.Common.ServerCommands.ServerSearch;
 import org.example.Common.ServerCommands.ServerShowAdvertisement;
 
 import java.util.ArrayList;
