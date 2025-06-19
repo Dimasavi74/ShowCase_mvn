@@ -1,9 +1,12 @@
 package org.example.Client.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerMyFavourites;
+import org.example.Common.ServerCommands.ServerRemoveFavourite;
 import org.example.Common.User;
 
 import java.util.ArrayList;
@@ -11,22 +14,23 @@ import java.util.HashMap;
 
 public class RemoveFavourite implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     final String[] necessaryKeys = {"advertisementId"};
     private final HashMap<String, String> data = new HashMap<>();
     private Integer advertisementId;
 
 
-    public RemoveFavourite(Outputer out, BdManager bd, User u) {
+    public RemoveFavourite(Outputer out, Communicator com, User u) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
         this.user = u;
     }
 
     public void execute() {
         try {
-            if (bdManager.removeFavourite(user, advertisementId)) {
+            ServerRemoveFavourite removeFavouriteCommand = (ServerRemoveFavourite) communicator.executeCommand(new ServerRemoveFavourite(advertisementId, user));
+            if (removeFavouriteCommand.isFavouriteDeleted) {
                 outputer.outputLine("Объявление №" + advertisementId + " вам больше не нравится!");
             } else {
                 outputer.outputLine("Объявление не было убрано! Проверьте корректность введенных данных и повторите попытку!");

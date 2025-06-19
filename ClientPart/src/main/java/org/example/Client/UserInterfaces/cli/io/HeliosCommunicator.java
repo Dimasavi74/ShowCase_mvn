@@ -1,45 +1,43 @@
 package org.example.Client.UserInterfaces.cli.io;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
+
+import org.example.Common.ChannelWrapper;
+import org.example.Common.Exceptions.DefaultException;
 import org.example.Common.ServerCommands.ServerCommand;
 
 public class HeliosCommunicator implements Communicator {
-    private Socket socket;
-    private InetAddress host;
+    private SocketChannel channel;
+    private String host;
     private int port;
-    private InputStream is;
-    private OutputStream os;
-
 
     public HeliosCommunicator(String host, int port) throws IOException {
-        this.socket = new Socket(host, port);
-        is = socket.getInputStream();
-        os = socket.getOutputStream();
-        this.socket.setSoTimeout(10000);
+        channel = SocketChannel.open();
+        this.host = host;
+        this.port = port;
+
     }
 
     public ServerCommand executeCommand(ServerCommand command) {
         try {
-            sendCommand(command);
-            ServerCommand newCommand = getCommand();
+            if (!channel.isConnected()) {
+                channel = SocketChannel.open();
+                channel.connect(new InetSocketAddress(host, port));
+            }
+            ChannelWrapper wrapper = new ChannelWrapper(channel);
+            wrapper.writeObject(command);
+            ServerCommand newCommand = (ServerCommand) wrapper.readObject();
+            channel.close();
+            if (newCommand.getError() != null &&  newCommand.getError().equals("SerializationError")) {
+                throw new DefaultException(newCommand.getError());
+            }
             return newCommand;
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new DefaultException(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new DefaultException(e.getMessage());
         }
-    }
-
-    private void sendCommand(ServerCommand command) throws IOException {
-        System.out.println(command);
-        ObjectOutputStream oos = new ObjectOutputStream(os);
-        oos.flush();
-        oos.writeObject(command);
-    }
-
-    private ServerCommand getCommand() throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(is);
-        return (ServerCommand) ois.readObject();
     }
 }

@@ -55,48 +55,66 @@ public class HeliosBdManager implements BdManager {
     public HashMap<Integer, String> search(String[] words, String[] tags, Integer advertisementId) {
         try {
             if (connection.isClosed()) {connect();}
+
+            System.out.println(Arrays.toString(words));
+
             String query;
-            Array sqlArray = connection.createArrayOf("TEXT", tags);
             ResultSet result;
+
+            query = "TRUNCATE ChangedTable;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.executeUpdate();
+            query = "TRUNCATE ChangedTable2;";
+            ps = connection.prepareStatement(query);
+            ps.executeUpdate();
+            query = "INSERT INTO ChangedTable SELECT * FROM WordToAdvertisement;";
+            ps = connection.prepareStatement(query);
+            ps.executeUpdate();
+
+            for (int i = 0; i < words.length; i++) {
+                query = "INSERT INTO ChangedTable2 SELECT * FROM ChangedTable WHERE AdvertisementId IN (SELECT AdvertisementId FROM ChangedTable WHERE ChangedTable.Word = ?);";
+                ps = connection.prepareStatement(query);
+                ps.setString(1, words[i]);
+                ps.executeUpdate();
+                query = "TRUNCATE ChangedTable;";
+                ps = connection.prepareStatement(query);
+                ps.executeUpdate();
+                query = "INSERT INTO ChangedTable SELECT * FROM ChangedTable2;";
+                ps = connection.prepareStatement(query);
+                ps.executeUpdate();
+                query = "TRUNCATE ChangedTable2;";
+                ps = connection.prepareStatement(query);
+                ps.executeUpdate();
+            }
+
+            Array sqlArray = connection.createArrayOf("TEXT", tags);
             query = "SELECT * FROM (SELECT AdvertisementId, array_agg(Tag) FROM AdvertisementTags " +
                         "GROUP BY AdvertisementId HAVING array_agg(Tag) @> ARRAY[?]::text[]) AS Tags " +
-                        "INNER JOIN Advertisement ON Tags.AdvertisementId = Advertisement.AdvertisementId;";
-            PreparedStatement ps = connection.prepareStatement(query);
+                        "INNER JOIN Advertisement ON Tags.AdvertisementId = Advertisement.AdvertisementId " +
+                    "INNER JOIN ChangedTable ON Tags.AdvertisementId = ChangedTable.AdvertisementId;";
+            ps = connection.prepareStatement(query);
             ps.setArray(1, sqlArray);
             result = ps.executeQuery();
 
-            boolean flag = false;
             HashMap<Integer, String> resultMap = new HashMap<>();
-            if (!result.next()) {
-                throw new DefaultException("KeyDoesNotExistError");
-            } else {
-                do {
+            System.out.println(resultMap);
+            while (result.next()) {
                     Integer id = result.getInt(1);
                     String title = result.getString(5);
-                    String description = result.getString(6);
-                    String price = result.getString(7);
-                    String contacts = result.getString(8);
+//                    String description = result.getString(6);
+//                    String price = result.getString(7);
+//                    String contacts = result.getString(8);
 
                     if (advertisementId != 0 && !(id.equals(advertisementId))) {
                         continue;
                     }
-
-                    for (String word: words) {
-                        if (!(title + description + price + contacts).contains(word)) {
-                            flag = true;
-                            break;
-                        }
-                    }
-
-                    if (!flag) {
-                        resultMap.put(id, title);
-                    }
-                } while (result.next());
-            }
+                    resultMap.put(id, title);
+                }
+            System.out.println(resultMap);
             return resultMap;
 
         } catch(SQLException e){
-            throw new DefaultException("ServerError");
+            throw new RuntimeException(e);
         }
     }
 
@@ -190,32 +208,9 @@ public class HeliosBdManager implements BdManager {
 
             query = "INSERT INTO WordToAdvertisement VALUES (?, ?);";
             ps = connection.prepareStatement(query);
-
-            Path path = Paths.get("src/main/java/org/example/Bd/words.txt");
-            String[] words = Files.readString(path).split("\n");
-            for (int i=0; i < words.length; i++) {
-                words[i] = words[i].strip();
-            }
             String[] adWords = String.join(" ", Arrays.asList((advertisement.title + " " + advertisement.description).split("\n"))).split(" ");
-            boolean flag = false;
             for (String el: adWords) {
-                if (Arrays.asList(words).contains(el.toLowerCase())) {
-                    flag = true;
-                    ps.setString(1, el.toLowerCase());
-                    ps.setInt(2, advertisementId);
-                    try {
-                        ps.execute();
-                    } catch (SQLException e) {
-                        if (e.getSQLState().equals("23505")) {
-                        } else {
-                            throw new DefaultException("ServerError");
-                        }
-                    }
-                }
-
-            }
-            if (!flag) {
-                ps.setString(1, "extra");
+                ps.setString(1, el.toLowerCase());
                 ps.setInt(2, advertisementId);
                 try {
                     ps.execute();
@@ -249,8 +244,6 @@ public class HeliosBdManager implements BdManager {
             } else {
                 throw new DefaultException("ServerError");
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

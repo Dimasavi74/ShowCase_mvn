@@ -19,16 +19,14 @@ public class MainCycleController {
     private Inputer inputer;
     private Parser parser;
     private Outputer outputer;
-    private BdManager bdManager;
     private Communicator communicator;
     private User user;
     private StandardCommandBuilderSettings settings;
 
-    public MainCycleController(Inputer inp, Parser prs, Outputer out, BdManager bd, Communicator communicator, User u, StandardCommandBuilderSettings s) {
+    public MainCycleController(Inputer inp, Parser prs, Outputer out, Communicator communicator, User u, StandardCommandBuilderSettings s) {
         this.inputer = inp;
         this.parser = prs;
         this.outputer = out;
-        this.bdManager = bd;
         this.communicator = communicator;
         this.user = u;
         this.settings = s;
@@ -40,7 +38,7 @@ public class MainCycleController {
             String newCommandLine = this.inputer.getLine();
             CommandData parsedCommandData = this.parser.parseLine(newCommandLine);
 
-            CommandBuilder builder = new StandardCommandBuilder(outputer, inputer, parser, bdManager, communicator, user, settings, this);
+            CommandBuilder builder = new StandardCommandBuilder(outputer, inputer, parser, communicator, user, settings, this);
 
             try {
                 Command command = builder.build(parsedCommandData);

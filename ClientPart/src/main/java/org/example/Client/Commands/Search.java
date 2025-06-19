@@ -1,32 +1,37 @@
 package org.example.Client.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
+import org.example.Common.ServerCommands.ServerMyFavourites;
+import org.example.Common.ServerCommands.ServerSearch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Search implements Command{
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {};
     private String[] words = {};
     private String[] tags = {};
     private Integer advertisementId = 0;
 
-    public Search(Outputer out, BdManager bd) {
+    public Search(Outputer out, Communicator com) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
     }
 
     public void execute() {
         try {
-            HashMap<Integer, String> result = bdManager.search(words, tags, advertisementId);
+            ServerSearch searchCommand = (ServerSearch) communicator.executeCommand(new ServerSearch(words, tags, advertisementId));
+            HashMap<Integer, String> result = searchCommand.searchResult;
             if (result.isEmpty()) {
-                outputer.outputLine("По вашему запросу ничего не найдено!1");
+                outputer.outputLine("По вашему запросу ничего не найдено!");
             } else {
                 for (int id : result.keySet()) {
                     outputer.outputLine("Объявление №" + id + ": " + result.get(id));
@@ -50,7 +55,7 @@ public class Search implements Command{
             for (int i = 0; i < rawWords.length; i++) {
                 rawWords[i] = rawWords[i].strip();
             }
-            tags = words;
+            words = rawWords;
         }
         if (d.containsKey("tags")) {
             data.put("tags", d.get("tags"));

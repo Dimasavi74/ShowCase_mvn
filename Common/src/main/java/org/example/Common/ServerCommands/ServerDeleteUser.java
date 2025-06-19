@@ -6,7 +6,7 @@ import org.example.Common.Exceptions.DefaultException;
 import java.io.Serializable;
 
 public class ServerDeleteUser implements ServerCommand, Serializable {
-    private BdManager bdManager;
+    private transient BdManager bdManager;
     public DefaultException error;
     public boolean isDeleted;
     private String nickname;

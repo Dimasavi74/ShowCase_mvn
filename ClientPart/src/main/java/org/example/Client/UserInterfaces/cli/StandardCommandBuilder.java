@@ -4,7 +4,6 @@ package org.example.Client.UserInterfaces.cli;
 import org.example.Client.Commands.*;
 import org.example.Client.UserInterfaces.MainCycleController;
 import org.example.Client.UserInterfaces.cli.io.*;
-import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Common.User;
 
@@ -14,19 +13,17 @@ public class StandardCommandBuilder implements CommandBuilder {
     private Inputer inputer;
     private Parser parser;
     private Outputer outputer;
-    private BdManager bdManager;
     private Communicator communicator;
     private User user;
     private final HashMap<String, Command> commandObjects = new HashMap<>();
     private StandardCommandBuilderSettings settings;
     private MainCycleController mainCycleController;
 
-    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, BdManager bdManager, Communicator communicator, User user, StandardCommandBuilderSettings settings, MainCycleController mcController) {
+    public StandardCommandBuilder(Outputer outputer, Inputer inputer, Parser parser, Communicator communicator, User user, StandardCommandBuilderSettings settings, MainCycleController mcController) {
 
         this.inputer = inputer;
         this.parser = parser;
         this.outputer = outputer;
-        this.bdManager = bdManager;
         this.communicator = communicator;
         this.user = user;
         this.settings = settings;
@@ -35,19 +32,19 @@ public class StandardCommandBuilder implements CommandBuilder {
         commandObjects.put("help", new Help(outputer, commandObjects));
         commandObjects.put("exit", new Exit(mcController));
         commandObjects.put("getInfo", new GetInfo(outputer, commandObjects));
-        commandObjects.put("register", new Register(outputer, bdManager));
-        commandObjects.put("login", new Login(outputer, bdManager,communicator, user));
-        commandObjects.put("deleteUser", new DeleteUser(outputer, bdManager));
-        commandObjects.put("createAdvertisement", new CreateAdvertisement(outputer, bdManager, user));
-        commandObjects.put("deleteAdvertisement", new DeleteAdvertisement(outputer, bdManager, user));
-        commandObjects.put("myAdvertisements", new MyAdvertisements(outputer, bdManager, user));
-        commandObjects.put("showAdvertisement", new ShowAdvertisement(outputer, bdManager));
-        commandObjects.put("search", new Search(outputer, bdManager));
+        commandObjects.put("register", new Register(outputer, communicator));
+        commandObjects.put("login", new Login(outputer, communicator, user));
+        commandObjects.put("deleteUser", new DeleteUser(outputer,  communicator));
+        commandObjects.put("createAdvertisement", new CreateAdvertisement(outputer, communicator, user));
+        commandObjects.put("deleteAdvertisement", new DeleteAdvertisement(outputer, communicator, user));
+        commandObjects.put("myAdvertisements", new MyAdvertisements(outputer, communicator, user));
+        commandObjects.put("showAdvertisement", new ShowAdvertisement(outputer, communicator));
+        commandObjects.put("search", new Search(outputer, communicator));
         commandObjects.put("changeMode", new ChangeMode(outputer, settings));
         commandObjects.put("logout", new Logout(outputer, user));
-        commandObjects.put("addFavourite", new AddFavourite(outputer, bdManager, user));
-        commandObjects.put("removeFavourite", new RemoveFavourite(outputer, bdManager, user));
-        commandObjects.put("myFavourites", new MyFavourites(outputer, bdManager, user));
+        commandObjects.put("addFavourite", new AddFavourite(outputer, communicator, user));
+        commandObjects.put("removeFavourite", new RemoveFavourite(outputer, communicator, user));
+        commandObjects.put("myFavourites", new MyFavourites(outputer, communicator, user));
         commandObjects.put("executeFile", new ExecuteFile(outputer, inputer, parser, this));
 
     }
@@ -69,14 +66,14 @@ public class StandardCommandBuilder implements CommandBuilder {
         if (command.checkCompleteness()) {
             return command;
         } else {
-            throw new DefaultException("Некоторые обязательные поля остались незаполненными: "
+            throw new DefaultException("Некоторые обязательные поля остались незаполненными или введенные вами данные некорректны: "
                     + String.join(" ", command.getEmptyFields()));
         }
     }
 
     private void standardInput(Command command) {
         while (!command.checkCompleteness()) {
-            outputer.outputLine("Некоторые обязательные поля остались незаполненными: "
+            outputer.outputLine("Некоторые обязательные поля остались незаполненными или введенные вами данные некорректны: "
                     + String.join(" ", command.getEmptyFields()));
             String newDataLine = this.inputer.getLine();
             CommandData parsedData = this.parser.parseLine(newDataLine);
@@ -85,6 +82,7 @@ public class StandardCommandBuilder implements CommandBuilder {
     }
 
     private void lineInput(Command command) {
+        outputer.outputLine("Для просмотра необязательных аргументов воспользуйтесь командой /getInfo;");
         while (!command.checkCompleteness()) {
             outputer.outputLine("Введите обязательное поле: ");
             outputer.outputHalfLine(command.getEmptyFields().get(0) + ": ");

@@ -10,16 +10,15 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         Inputer inputer = new ConsoleInputer();
         Parser parser = new StandardParser();
         Outputer outputer = new ConsoleOutputer();
-        HeliosBdManager bdManager = new HeliosBdManager();
         HeliosCommunicator communicator = new HeliosCommunicator("localhost", 54321);
         User user = new User();
         StandardCommandBuilderSettings settings = new StandardCommandBuilderSettings();
         settings.inputMode = "default";
-        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, bdManager, communicator, user, settings);
+        MainCycleController mainCycleController = new MainCycleController(inputer, parser, outputer, communicator, user, settings);
         mainCycleController.mainCycle();
     }
 }

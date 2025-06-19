@@ -1,10 +1,13 @@
 package org.example.Client.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Advertisement;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
+import org.example.Common.ServerCommands.ServerSearch;
+import org.example.Common.ServerCommands.ServerShowAdvertisement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,20 +15,21 @@ import java.util.HashMap;
 
 public class ShowAdvertisement implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {"advertisementId"};
     private Integer advertisementId;
 
 
-    public ShowAdvertisement(Outputer out, BdManager bd) {
+    public ShowAdvertisement(Outputer out, Communicator com) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
     }
 
     public void execute() {
         try {
-            Advertisement advertisement = bdManager.showAdvertisement(advertisementId);
+            ServerShowAdvertisement showAdvertisementCommand = (ServerShowAdvertisement) communicator.executeCommand(new ServerShowAdvertisement(advertisementId));
+            Advertisement advertisement = showAdvertisementCommand.advertisement;
             outputer.outputLine("Объявление №" + advertisementId + ":");
             outputer.outputLine(advertisement.title);
             outputer.outputLine(advertisement.description);

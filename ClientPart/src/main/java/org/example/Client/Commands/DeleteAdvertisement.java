@@ -1,30 +1,34 @@
 package org.example.Client.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerCreateAdvertisement;
+import org.example.Common.ServerCommands.ServerDeleteAdvertisement;
 import org.example.Common.User;
 
 import java.util.HashMap;
 
 public class DeleteAdvertisement implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {"advertisementId"};
     private Integer advertisementId;
 
-    public DeleteAdvertisement(Outputer out, BdManager bd, User u) {
+    public DeleteAdvertisement(Outputer out, Communicator com, User u) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
         this.user = u;
     }
 
     public void execute() {
         try {
-            if (bdManager.deleteAdvertisement(advertisementId, user)) {
+            ServerDeleteAdvertisement deleteAdvertisementCommand = (ServerDeleteAdvertisement) communicator.executeCommand(new ServerDeleteAdvertisement(advertisementId, user));
+            if (deleteAdvertisementCommand.isAdvertisementDeleted) {
                 outputer.outputLine("Объявление №" + advertisementId + " удалено!");
             } else {
                 outputer.outputLine("У вас нет такого объявления! Проверьте корректность введенных данных!");

@@ -7,7 +7,7 @@ import org.example.Common.User;
 import java.io.Serializable;
 
 public class ServerRemoveFavourite implements ServerCommand, Serializable {
-    private BdManager bdManager;
+    private transient BdManager bdManager;
     public DefaultException error;
     public boolean isFavouriteDeleted;
     private Integer advertisementId;

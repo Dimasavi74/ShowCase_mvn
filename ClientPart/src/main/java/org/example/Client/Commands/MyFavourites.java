@@ -1,7 +1,10 @@
 package org.example.Client.Commands;
 
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerMyAdvertisements;
+import org.example.Common.ServerCommands.ServerMyFavourites;
 import org.example.Common.User;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 
@@ -10,20 +13,21 @@ import java.util.HashMap;
 
 public class MyFavourites implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {};
 
-    public MyFavourites(Outputer out, BdManager bd, User u) {
+    public MyFavourites(Outputer out, Communicator com, User u) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
         this.user = u;
     }
 
     public void execute() {
         try {
-            HashMap<Integer, String> result = bdManager.userFavourites(user);
+            ServerMyFavourites myFavouritesCommand = (ServerMyFavourites) communicator.executeCommand(new ServerMyFavourites(user));
+            HashMap<Integer, String> result = myFavouritesCommand.userFavourites;
             if (result.isEmpty()) {
                 outputer.outputLine("Вы еще не добавили ни одного объявления!");
             } else {

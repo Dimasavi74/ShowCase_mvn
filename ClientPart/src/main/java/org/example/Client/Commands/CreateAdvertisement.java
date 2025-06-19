@@ -1,17 +1,20 @@
 package org.example.Client.Commands;
 
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.example.Common.Advertisement;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerCreateAdvertisement;
+import org.example.Common.ServerCommands.ServerRegister;
 import org.example.Common.User;
 
 import java.util.HashMap;
 
 public class CreateAdvertisement implements Command{
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {"title", "description", "price", "contacts", "tags"};
@@ -21,16 +24,17 @@ public class CreateAdvertisement implements Command{
     private String contacts;
     private String[] tags = {};
 
-    public CreateAdvertisement(Outputer out, BdManager bd, User u) {
+    public CreateAdvertisement(Outputer out, Communicator com, User u) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
         this.user = u;
     }
 
     public void execute() {
         try {
             Advertisement advertisement = new Advertisement(title, description, price, contacts, tags);
-            int id = bdManager.createAdvertisement(advertisement, user);
+            ServerCreateAdvertisement createAdvertisementCommand = (ServerCreateAdvertisement) communicator.executeCommand(new ServerCreateAdvertisement(advertisement, user));
+            int id = createAdvertisementCommand.advertisementId;
             if (id != 0) {
                 outputer.outputLine("Объявление №" + id + " успешно создано!");
             } else {

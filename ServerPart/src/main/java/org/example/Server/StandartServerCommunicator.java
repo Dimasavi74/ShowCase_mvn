@@ -33,27 +33,20 @@ public class StandartServerCommunicator implements ServerCommunicator {
     }
 
     public Set<Request> getRequests(){
-        var sc = (SocketChannel) key.channel();
-        var data = (ClientData) key.attachment();
-
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutputStream os = new ObjectOutputStream(bos)) {
-
-            os.writeObject(data.command);
-            os.flush(); // Важно!
-
-            byte[] bytes = bos.toByteArray();
-            ByteBuffer outputBuffer = ByteBuffer.allocate(bytes.length);
-            outputBuffer.put(bytes);
-            outputBuffer.flip(); // Переключаем в режим чтения
-
-            // Гарантированная отправка всех данных
-            while (outputBuffer.hasRemaining()) {
-                sc.write(outputBuffer);
-            }
-
-        } finally {
-            key.cancel();
-            sc.close(); // Закрываем после отправки
+        try {
+            selector.select();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        Set<SelectionKey> keys = selector.selectedKeys();
+        Set<Request> requests = new HashSet<>();
+        for (var iter = keys.iterator(); iter.hasNext(); ) {
+            SelectionKey key = iter.next();
+            System.out.println(key);
+            iter.remove();
+            Request request = new Request(counter++, key);
+            requests.add(request);
+        }
+        return requests;
+    }
 }

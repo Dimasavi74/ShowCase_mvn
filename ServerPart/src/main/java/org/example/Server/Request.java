@@ -1,15 +1,15 @@
 package org.example.Server;
 
 import org.example.Common.Bd.HeliosBdManager;
+import org.example.Common.ChannelWrapper;
+import org.example.Common.Exceptions.DefaultException;
 import org.example.Common.ServerCommands.ServerCommand;
+import org.example.Common.ServerCommands.ServerEmptyCommand;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 
 import static java.nio.channels.SelectionKey.*;
 
@@ -43,6 +43,9 @@ public class Request implements Runnable {
 //            key.attach(data);
 //            data.command.setError(exception.getMessage());
 //            throw new RuntimeException(exception);
+            throw new DefaultException(exception.getMessage());
+        } catch (InterruptedException e) {
+            throw new DefaultException(e.getMessage());
         }
         System.out.printf("Обработан запрос #%d в потоке id=%d\n", reqNumber, Thread.currentThread().getId());
     }
@@ -50,67 +53,45 @@ public class Request implements Runnable {
     public void doAccept() throws IOException {
         var ssc = (ServerSocketChannel) key.channel();
         var sc = ssc.accept();
-        if (sc == null) {
-            return;
-        }
         sc.configureBlocking(false);
         SelectionKey clientKey = sc.register(key.selector(), OP_READ);
         clientKey.attach(new ClientData());
-        key.selector().wakeup();
     }
 
-    public void doRead() throws IOException {
+    public void doRead() throws IOException, InterruptedException {
         SocketChannel sc = (SocketChannel) key.channel();
+        sc.configureBlocking(false);
         ClientData data = (ClientData) key.attachment();
-
-        System.out.println(1);
-        int bytesRead = sc.read(data.bodyBuffer);
-        System.out.println(2);
-        if (bytesRead == -1) throw new EOFException("Connection closed");
-        System.out.println(3);
-        data.bodyBuffer.flip();
-        byte[] objectData = new byte[data.bodyBuffer.remaining()];
-        data.bodyBuffer.get(objectData);
-
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
-             ObjectInputStream ois = new ObjectInputStream(bais)) {
-            System.out.println(4);
-            System.out.println(Arrays.toString(objectData));
-            try {
-                data.command = (ServerCommand) ois.readObject();
-                System.out.println(5);
-                data.command.setBdManager(new HeliosBdManager());
-                System.out.println(6);
-                data.command.execute();
-                SelectionKey clientKey = sc.register(key.selector(), OP_WRITE);
-                System.out.println(7);
-                clientKey.attach(data);
-                key.selector().wakeup();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        System.out.println(sc);
+        ChannelWrapper wrapper = new ChannelWrapper(sc);
+        try {
+            data.command = (ServerCommand) wrapper.readObject();
+        } catch (ClassNotFoundException e) {
+            data.isError = true;
+            data.errorMessage = "SerializationError";
         }
-
+        System.out.println(data.command);
+        data.command.setBdManager(new HeliosBdManager());
+        data.command.execute();
+        SelectionKey clientKey = sc.register(key.selector(), OP_WRITE);
+        clientKey.attach(data);
     }
 
 
     public void doWrite() throws IOException {
-        var sc = (SocketChannel) key.channel();
-        var data = (ClientData) key.attachment();
-
-        data.bodyBuffer.flip();
-
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutputStream os = new ObjectOutputStream(bos)) {
-            os.writeObject(data.command);
-            ByteBuffer outputBuffer = ByteBuffer.allocate(1024 * 16);
-            outputBuffer.put(bos.toByteArray());
-            sc.write(outputBuffer);
-            key.cancel();
-            sc.close();
+        SocketChannel sc = (SocketChannel) key.channel();
+        sc.configureBlocking(false);
+        ClientData data = (ClientData) key.attachment();
+        ChannelWrapper wrapper = new ChannelWrapper(sc);
+        ServerCommand command;
+        if (data.isError) {
+            command = new ServerEmptyCommand();
+            command.setError(data.errorMessage);
+        } else {
+            command = data.command;
         }
-
-    }
+        wrapper.writeObject(command);
+        key.cancel();
+        sc.close();
+        }
 }

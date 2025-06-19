@@ -1,8 +1,11 @@
 package org.example.Client.Commands;
 
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerDeleteAdvertisement;
+import org.example.Common.ServerCommands.ServerMyAdvertisements;
 import org.example.Common.User;
 
 import java.util.ArrayList;
@@ -10,20 +13,21 @@ import java.util.HashMap;
 
 public class MyAdvertisements implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     private final HashMap<String, String> data = new HashMap<>();
     final String[] necessaryKeys = {};
 
-    public MyAdvertisements(Outputer out, BdManager bd, User u) {
+    public MyAdvertisements(Outputer out, Communicator com, User u) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
         this.user = u;
     }
 
     public void execute() {
         try {
-            HashMap<Integer, String> result = bdManager.userAdvertisements(user);
+            ServerMyAdvertisements myAdvertisementsCommand = (ServerMyAdvertisements) communicator.executeCommand(new ServerMyAdvertisements(user));
+            HashMap<Integer, String> result = myAdvertisementsCommand.userAdvertisements;
             if (result.isEmpty()) {
                 outputer.outputLine("Вы еще не создали ни одного объявления!");
             } else {

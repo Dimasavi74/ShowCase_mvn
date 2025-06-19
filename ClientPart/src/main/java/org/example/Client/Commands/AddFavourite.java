@@ -1,31 +1,35 @@
 package org.example.Client.Commands;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerAddFavourite;
+import org.example.Common.ServerCommands.ServerMyFavourites;
 import org.example.Common.User;
 
 import java.util.HashMap;
 
 public class AddFavourite implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     private User user;
     final String[] necessaryKeys = {"advertisementId"};
     private final HashMap<String, String> data = new HashMap<>();
     private Integer advertisementId;
 
 
-    public AddFavourite(Outputer out, BdManager bd, User u) {
+    public AddFavourite(Outputer out,  Communicator com, User u) {
         this.outputer = out;
-        this.bdManager = bd;
+        this.communicator = com;
         this.user = u;
     }
 
     public void execute() {
         try {
-            if (bdManager.addFavourite(user, advertisementId)) {
+            ServerAddFavourite addFavouriteCommand = (ServerAddFavourite) communicator.executeCommand(new ServerAddFavourite(advertisementId, user));
+            if (addFavouriteCommand.isFavouriteAdded) {
                 outputer.outputLine("Объявление №" + advertisementId + " успешно добавлено в \"Понравившееся\"");
             } else {
                 outputer.outputLine("Объявление не было добавлено! Проверьте корректность введенных данных и повторите попытку!");

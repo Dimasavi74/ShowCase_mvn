@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 public class Login implements Command{
     private Outputer outputer;
-    private BdManager bdManager;
     private Communicator communicator;
     private User user;
     final String[] necessaryKeys = {"nickname", "mailAddress", "password"};
@@ -21,9 +20,8 @@ public class Login implements Command{
     private String mailAddress;
     private String password;
 
-    public Login(Outputer out, BdManager bd, Communicator com, User u) {
+    public Login(Outputer out, Communicator com, User u) {
         outputer = out;
-        bdManager = bd;
         user = u;
         communicator = com;
     }

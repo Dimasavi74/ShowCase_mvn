@@ -7,7 +7,7 @@ import org.example.Common.User;
 import java.io.Serializable;
 
 public class ServerAddFavourite implements ServerCommand, Serializable {
-    private BdManager bdManager;
+    private transient BdManager bdManager;
     public DefaultException error;
     public boolean isFavouriteAdded;
     private Integer advertisementId;

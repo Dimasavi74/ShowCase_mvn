@@ -1,30 +1,34 @@
 package org.example.Client.Commands;
 
 
+import org.example.Client.UserInterfaces.cli.io.Communicator;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
+import org.example.Common.ServerCommands.ServerDeleteUser;
+import org.example.Common.ServerCommands.ServerRegister;
 
 import java.util.HashMap;
 
 public class DeleteUser implements Command{
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     final String[] necessaryKeys = {"nickname", "mailAddress", "password"};
     private final HashMap<String, String> data = new HashMap<>();
     private String nickname;
     private String mailAddress;
     private String password;
 
-    public DeleteUser(Outputer out, BdManager bd) {
+    public DeleteUser(Outputer out, Communicator com) {
         outputer = out;
-        bdManager = bd;
+        communicator = com;
     }
 
 
     public void execute() {
         try {
-            if (bdManager.deleteUser(nickname, mailAddress, password)) {
+            ServerDeleteUser deleteUserCommand = (ServerDeleteUser) communicator.executeCommand(new ServerDeleteUser(nickname, mailAddress, password));
+            if (deleteUserCommand.isDeleted) {
                 outputer.outputLine("Пользователь удален!");
             } else {
                 outputer.outputLine("Такого пользователя не существует! Проверьте корректность введенных данных!");

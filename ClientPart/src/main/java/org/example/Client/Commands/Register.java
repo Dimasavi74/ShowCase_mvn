@@ -1,29 +1,34 @@
 package org.example.Client.Commands;
 
+import org.example.Client.UserInterfaces.cli.io.Communicator;
+import org.example.Client.UserInterfaces.cli.io.HeliosCommunicator;
 import org.example.Common.Bd.BdManager;
 import org.example.Common.Exceptions.DefaultException;
 import org.example.Client.UserInterfaces.cli.io.Outputer;
+import org.example.Common.ServerCommands.ServerLogin;
+import org.example.Common.ServerCommands.ServerRegister;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Register implements Command {
     private Outputer outputer;
-    private BdManager bdManager;
+    private Communicator communicator;
     final String[] necessaryKeys = {"nickname", "mailAddress", "password"};
     private final HashMap<String, String> data = new HashMap<>();
     private String nickname;
     private String mailAddress;
     private String password;
 
-    public Register(Outputer out, BdManager bd) {
+    public Register(Outputer out, Communicator com) {
         outputer = out;
-        bdManager = bd;
+        communicator = com;
     }
 
     public void execute() {
         try {
-            if (bdManager.register(nickname, mailAddress, password)) {
+            ServerRegister registerCommand = (ServerRegister) communicator.executeCommand(new ServerRegister(nickname, mailAddress, password));
+            if (registerCommand.isRegistered) {
                 outputer.outputLine("Пользователь " + nickname + " успешно добавлен!");
             } else {
                 outputer.outputLine("Пользователь не был добавлен! Проверьте корректность введенных данных и повторите попытку!");

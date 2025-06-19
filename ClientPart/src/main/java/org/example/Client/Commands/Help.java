@@ -17,7 +17,9 @@ public class Help implements Command {
     }
 
     public void execute() {
+        this.outputer.outputLine("Общий вид команд: /названиеКоманды названиеАргумента1{данные, данные...} названиеАргумента2{данные}");
         this.outputer.outputLine("Список доступных команд:\n/" + String.join(";\n/", commands.keySet()) + ";");
+        this.outputer.outputLine("Для более подробной информации воспользуйтесь командой /getInfo commandName{названиеКоманды};");
     }
 
     public void setData(HashMap<String, String> data) {
