@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public class ServerCreateAdvertisement implements ServerCommand, Serializable {
     private transient BdManager bdManager;
-    public DefaultException error;
+    public DefaultException error = new DefaultException("");
     public boolean isAdvertisementCreated;
     public Integer advertisementId;
     private Advertisement advertisement;

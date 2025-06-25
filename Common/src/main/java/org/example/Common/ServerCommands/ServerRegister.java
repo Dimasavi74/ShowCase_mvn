@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 public class ServerRegister implements ServerCommand, Serializable {
     private transient BdManager bdManager;
-    public DefaultException error;
+    public DefaultException error = new DefaultException("");
     public boolean isRegistered;
     private String nickname;
     private String mailAddress;

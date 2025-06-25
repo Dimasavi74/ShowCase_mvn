@@ -5,11 +5,12 @@ import org.example.Common.Exceptions.DefaultException;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ServerSearch implements ServerCommand, Serializable {
     private transient BdManager bdManager;
-    public DefaultException error;
-    public HashMap<Integer, String> searchResult;
+    public DefaultException error = new DefaultException("");
+    public Map<Integer, String> searchResult;
     private String[] words = {};
     private String[] tags = {};
     private Integer advertisementId = 0;

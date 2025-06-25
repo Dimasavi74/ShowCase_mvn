@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class ServerAddFavourite implements ServerCommand, Serializable {
     private transient BdManager bdManager;
-    public DefaultException error;
+    public DefaultException error = new DefaultException("");
     public boolean isFavouriteAdded;
     private Integer advertisementId;
     private User user;
