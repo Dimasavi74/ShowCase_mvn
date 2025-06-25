@@ -19,10 +19,7 @@ public class CycleController {
     public void mainCycle() {
         run = true;
         while (run) {
-            for (Request request: communicator.getRequests()) {
-                request.run();
-//                executorService.execute(request);
-            }
+            communicator.checkRequests();
         }
     }
 }

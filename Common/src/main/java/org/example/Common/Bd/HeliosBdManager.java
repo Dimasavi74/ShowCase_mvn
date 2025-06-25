@@ -22,7 +22,7 @@ public class HeliosBdManager implements BdManager {
     Properties info;
     Connection connection;
 
-    public HeliosBdManager() throws IOException, InterruptedException {
+    public HeliosBdManager() throws IOException {
 //        -L <local-address>:<local-port>:<remote-address>:<remote-port>
 //        ssh -L 5432:pg:5432 -p 2222 s467318@se.ifmo.ru
 

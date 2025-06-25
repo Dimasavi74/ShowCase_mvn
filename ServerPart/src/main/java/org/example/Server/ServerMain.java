@@ -5,8 +5,8 @@ import java.util.concurrent.Executors;
 
 public class ServerMain {
     public static void main(String[] args){
-        ServerCommunicator communicator = new StandartServerCommunicator();
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ServerCommunicator communicator = new StandartServerCommunicator(executorService);
         CycleController controller = new CycleController(communicator, executorService);
         controller.mainCycle();
 
