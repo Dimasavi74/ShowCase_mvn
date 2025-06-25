@@ -21,22 +21,16 @@ public class HeliosBdManager implements BdManager {
     Connection connection;
     String user;
     String password;
+    final String URL = "jdbc:postgresql://localhost:5432/studs";
 
     public HeliosBdManager(String usr, String pwd) {
 //        -L <local-address>:<local-port>:<remote-address>:<remote-port>
 //        ssh -L 5432:pg:5432 -p 2222 s467318@se.ifmo.ru
 
 
-
-        url = "jdbc:postgresql://localhost:5432/studs";
+        url = URL;
         user = usr;
         password = pwd;
-//        info = new Properties();
-//        File file = new File("src/main/java/org/example/Bd/db.cfg");
-
-//        File file = new File("C:\\Users\\Dimasavi74\\IdeaProjects\\ShowCase_mvn\\src\\main\\java\\org\\example\\Bd\\db.cfg");
-//        File file = new File("org/example/Common/Bd/db.cfg");
-//        info.load(new FileInputStream(file));
 
         connect();
     }
@@ -64,12 +58,6 @@ public class HeliosBdManager implements BdManager {
             String query;
             ResultSet result;
 
-            System.out.println(Arrays.toString(tags));
-            System.out.println(Arrays.toString(words));
-            System.out.println(advertisementId);
-            System.out.println(tags);
-            System.out.println(words);
-
             Array sqlArray = connection.createArrayOf("TEXT", tags);
             query = "SELECT * FROM (SELECT AdvertisementId, array_agg(Tag) FROM AdvertisementTags " +
                     "GROUP BY AdvertisementId HAVING array_agg(Tag) @> ARRAY[?]::text[]) AS Tags " +
@@ -88,8 +76,6 @@ public class HeliosBdManager implements BdManager {
                 }
                 tagMap.put(id, title);
             }
-            System.out.println(tagMap);
-            System.out.println(tagMap.keySet());
 
             query = "SELECT COUNT(*) from Advertisement;";
             ps = connection.prepareStatement(query);
@@ -177,72 +163,6 @@ public class HeliosBdManager implements BdManager {
                 ));
     }
 
-//    public HashMap<Integer, String> search(String[] words, String[] tags, Integer advertisementId) {
-//        try {
-//            if (connection.isClosed()) {connect();}
-//
-//            System.out.println(Arrays.toString(words));
-//
-//            String query;
-//            ResultSet result;
-//
-//            query = "TRUNCATE ChangedTable;";
-//            PreparedStatement ps = connection.prepareStatement(query);
-//            ps.executeUpdate();
-//            query = "TRUNCATE ChangedTable2;";
-//            ps = connection.prepareStatement(query);
-//            ps.executeUpdate();
-//            query = "INSERT INTO ChangedTable SELECT * FROM WordToAdvertisement;";
-//            ps = connection.prepareStatement(query);
-//            ps.executeUpdate();
-//
-//            for (int i = 0; i < words.length; i++) {
-//                query = "INSERT INTO ChangedTable2 SELECT * FROM ChangedTable WHERE AdvertisementId IN (SELECT AdvertisementId FROM ChangedTable WHERE ChangedTable.Word = ?);";
-//                ps = connection.prepareStatement(query);
-//                ps.setString(1, words[i]);
-//                ps.executeUpdate();
-//                query = "TRUNCATE ChangedTable;";
-//                ps = connection.prepareStatement(query);
-//                ps.executeUpdate();
-//                query = "INSERT INTO ChangedTable SELECT * FROM ChangedTable2;";
-//                ps = connection.prepareStatement(query);
-//                ps.executeUpdate();
-//                query = "TRUNCATE ChangedTable2;";
-//                ps = connection.prepareStatement(query);
-//                ps.executeUpdate();
-//            }
-//
-//            Array sqlArray = connection.createArrayOf("TEXT", tags);
-//            query = "SELECT * FROM (SELECT AdvertisementId, array_agg(Tag) FROM AdvertisementTags " +
-//                        "GROUP BY AdvertisementId HAVING array_agg(Tag) @> ARRAY[?]::text[]) AS Tags " +
-//                        "INNER JOIN Advertisement ON Tags.AdvertisementId = Advertisement.AdvertisementId " +
-//                    "INNER JOIN ChangedTable ON Tags.AdvertisementId = ChangedTable.AdvertisementId;";
-//            ps = connection.prepareStatement(query);
-//            ps.setArray(1, sqlArray);
-//            result = ps.executeQuery();
-//
-//            HashMap<Integer, String> resultMap = new HashMap<>();
-//            System.out.println(resultMap);
-//            while (result.next()) {
-//                    Integer id = result.getInt(1);
-//                    String title = result.getString(5);
-////                    String description = result.getString(6);
-////                    String price = result.getString(7);
-////                    String contacts = result.getString(8);
-//
-//                    if (advertisementId != 0 && !(id.equals(advertisementId))) {
-//                        continue;
-//                    }
-//                    resultMap.put(id, title);
-//                }
-//            System.out.println(resultMap);
-//            return resultMap;
-//
-//        } catch(SQLException e){
-//            throw new DefaultException("ServerError");
-//        }
-//    }
-
 
     public boolean register(String nickname, String mailAddress, String password) {
         try {
@@ -255,7 +175,7 @@ public class HeliosBdManager implements BdManager {
             ps.execute();
             return true;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23505")) {
+            if (e.getSQLState().equals("23505")) { // Повторение ключа
                 throw new DefaultException("KeyAlreadyExistsError");
             } else {
                 throw new DefaultException("ServerError");
@@ -339,7 +259,7 @@ public class HeliosBdManager implements BdManager {
                 try {
                     ps.execute();
                 } catch (SQLException e) {
-                    if (e.getSQLState().equals("23505")) {
+                    if (e.getSQLState().equals("23505")) { // Повторение ключа - пропуск
                     } else {
                         throw new RuntimeException(e);
 //                        throw new DefaultException("ServerError");
@@ -376,7 +296,7 @@ public class HeliosBdManager implements BdManager {
                 try {
                     ps.execute();
                 } catch (SQLException e) {
-                    if (e.getSQLState().equals("23505")) {
+                    if (e.getSQLState().equals("23505")) { // Повторение ключа
                         throw new DefaultException("TagAlreadyExistsError");
                     } else {
                         throw new DefaultException("ServerError");
@@ -385,7 +305,7 @@ public class HeliosBdManager implements BdManager {
             }
             return advertisementId;
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23505")) {
+            if (e.getSQLState().equals("23505")) { // Повторение ключа
                 throw new DefaultException("AdvertisementAlreadyExistsError");
             } else {
                 throw new DefaultException("ServerError");

@@ -77,7 +77,6 @@ public class Request implements Runnable {
         System.out.println("Ключ на чтение зарегистрирован!: " + clientKey);
         ClientData data = new ClientData();
         clientKey.attach(data);
-        System.out.println(1);
         blockedKeys.remove(key);
         key.selector().wakeup();
     }
