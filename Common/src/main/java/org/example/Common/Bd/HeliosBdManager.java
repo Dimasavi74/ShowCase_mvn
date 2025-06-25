@@ -12,10 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HeliosBdManager implements BdManager {
     String url;
@@ -56,71 +54,194 @@ public class HeliosBdManager implements BdManager {
         }
     }
 
-    public HashMap<Integer, String> search(String[] words, String[] tags, Integer advertisementId) {
+    public Map<Integer, String> search(String[] words, String[] tags, Integer advertisementId){
         try {
-            if (connection.isClosed()) {connect();}
+            if (connection.isClosed()) {
+                connect();
+            }
 
-            System.out.println(Arrays.toString(words));
-
+            PreparedStatement ps;
             String query;
             ResultSet result;
 
-            query = "TRUNCATE ChangedTable;";
-            PreparedStatement ps = connection.prepareStatement(query);
-            ps.executeUpdate();
-            query = "TRUNCATE ChangedTable2;";
-            ps = connection.prepareStatement(query);
-            ps.executeUpdate();
-            query = "INSERT INTO ChangedTable SELECT * FROM WordToAdvertisement;";
-            ps = connection.prepareStatement(query);
-            ps.executeUpdate();
-
-            for (int i = 0; i < words.length; i++) {
-                query = "INSERT INTO ChangedTable2 SELECT * FROM ChangedTable WHERE AdvertisementId IN (SELECT AdvertisementId FROM ChangedTable WHERE ChangedTable.Word = ?);";
-                ps = connection.prepareStatement(query);
-                ps.setString(1, words[i]);
-                ps.executeUpdate();
-                query = "TRUNCATE ChangedTable;";
-                ps = connection.prepareStatement(query);
-                ps.executeUpdate();
-                query = "INSERT INTO ChangedTable SELECT * FROM ChangedTable2;";
-                ps = connection.prepareStatement(query);
-                ps.executeUpdate();
-                query = "TRUNCATE ChangedTable2;";
-                ps = connection.prepareStatement(query);
-                ps.executeUpdate();
-            }
+            System.out.println(Arrays.toString(tags));
+            System.out.println(Arrays.toString(words));
+            System.out.println(advertisementId);
+            System.out.println(tags);
+            System.out.println(words);
 
             Array sqlArray = connection.createArrayOf("TEXT", tags);
             query = "SELECT * FROM (SELECT AdvertisementId, array_agg(Tag) FROM AdvertisementTags " +
-                        "GROUP BY AdvertisementId HAVING array_agg(Tag) @> ARRAY[?]::text[]) AS Tags " +
-                        "INNER JOIN Advertisement ON Tags.AdvertisementId = Advertisement.AdvertisementId " +
-                    "INNER JOIN ChangedTable ON Tags.AdvertisementId = ChangedTable.AdvertisementId;";
+                    "GROUP BY AdvertisementId HAVING array_agg(Tag) @> ARRAY[?]::text[]) AS Tags " +
+                    "INNER JOIN Advertisement ON Tags.AdvertisementId = Advertisement.AdvertisementId;";
             ps = connection.prepareStatement(query);
             ps.setArray(1, sqlArray);
             result = ps.executeQuery();
 
-            HashMap<Integer, String> resultMap = new HashMap<>();
-            System.out.println(resultMap);
+            HashMap<Integer, String> tagMap = new HashMap<>();
             while (result.next()) {
-                    Integer id = result.getInt(1);
-                    String title = result.getString(5);
-//                    String description = result.getString(6);
-//                    String price = result.getString(7);
-//                    String contacts = result.getString(8);
+                Integer id = result.getInt(1);
+                String title = result.getString(5);
+                System.out.println(advertisementId);
+                if (advertisementId != 0 && !(id.equals(advertisementId))) {
+                    continue;
+                }
+                tagMap.put(id, title);
+            }
+            System.out.println(tagMap);
+            System.out.println(tagMap.keySet());
 
-                    if (advertisementId != 0 && !(id.equals(advertisementId))) {
+            query = "SELECT COUNT(*) from Advertisement;";
+            ps = connection.prepareStatement(query);
+            result = ps.executeQuery();
+            result.next();
+            double numOfAds = result.getInt(1);
+
+            query = "SELECT SUM(NumberOfWords) FROM CountedWordToAdvertisement;";
+            ps = connection.prepareStatement(query);
+            result = ps.executeQuery();
+            result.next();
+            double totalWords = result.getInt(1);
+
+            double avgAdLen = totalWords / numOfAds;
+
+            Map<Integer, Double> adScore = new HashMap<>();
+
+            query = "SELECT DISTINCT AdvertisementId FROM CountedWordToAdvertisement;";
+            ps = connection.prepareStatement(query);
+            result = ps.executeQuery();
+
+            while (result.next()) {
+                Integer id = result.getInt(1);
+                adScore.put(id, 0.0);
+            }
+
+            for (String word: words) {
+                query = "SELECT COUNT(*) from (SELECT AdvertisementId from CountedWordToAdvertisement WHERE Word = ? Group By AdvertisementId);";
+                ps = connection.prepareStatement(query);
+                ps.setString(1, word);
+                result = ps.executeQuery();
+                result.next();
+                int numOfAdsWithWord = result.getInt(1);
+                double IDF = Math.log((numOfAds - numOfAdsWithWord + 0.5) / (numOfAdsWithWord + 0.5) + 1);
+
+                query = "SELECT T1.AdvertisementId, T1.NumberOfWords, T3 from CountedWordToAdvertisement AS T1 INNER JOIN (SELECT AdvertisementId, SUM(NumberOfWords) AS T3 from CountedWordToAdvertisement GROUP BY AdvertisementId) As T2 ON T2.AdvertisementId = T1.AdvertisementId WHERE Word = ?;";
+                ps = connection.prepareStatement(query);
+                ps.setString(1, word);
+                result = ps.executeQuery();
+                while (result.next()) {
+                    Integer id = result.getInt(1);
+                    if (!tagMap.containsKey(id)) {
                         continue;
                     }
-                    resultMap.put(id, title);
-                }
-            System.out.println(resultMap);
-            return resultMap;
+                    int numOfSuchWord = result.getInt(2);
+                    int numOfWords = result.getInt(3);
 
+                    double b = 0.75;
+                    double norm = 1 - b + b * numOfWords / avgAdLen;
+
+                    double k = 1.6;
+                    double frequency = numOfSuchWord * (k + 1) / (numOfSuchWord + k * norm);
+
+                    double score = IDF * frequency;
+
+                    adScore.put(id, adScore.get(id) + score);
+                }
+            }
+
+            int limit = 100;
+            adScore = sortMapByValueWithLimit(adScore, limit);
+
+            LinkedHashMap<Integer, String> resultMap = new LinkedHashMap<>();
+            adScore.forEach(
+                    (key, score) -> {
+                        resultMap.put(key, tagMap.get(key));
+                    }
+            );
+            return resultMap;
         } catch(SQLException e){
-            throw new DefaultException("ServerError");
+            throw new RuntimeException(e);
+//            throw new DefaultException("ServerError");
         }
     }
+
+    private Map<Integer, Double> sortMapByValueWithLimit(Map<Integer, Double> map, int n) {
+        return map.entrySet().stream()
+                .sorted(Map.Entry.<Integer, Double>comparingByValue().reversed())
+                .limit(n)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a, // обработчик конфликтов (не потребуется)
+                        LinkedHashMap::new
+                ));
+    }
+
+//    public HashMap<Integer, String> search(String[] words, String[] tags, Integer advertisementId) {
+//        try {
+//            if (connection.isClosed()) {connect();}
+//
+//            System.out.println(Arrays.toString(words));
+//
+//            String query;
+//            ResultSet result;
+//
+//            query = "TRUNCATE ChangedTable;";
+//            PreparedStatement ps = connection.prepareStatement(query);
+//            ps.executeUpdate();
+//            query = "TRUNCATE ChangedTable2;";
+//            ps = connection.prepareStatement(query);
+//            ps.executeUpdate();
+//            query = "INSERT INTO ChangedTable SELECT * FROM WordToAdvertisement;";
+//            ps = connection.prepareStatement(query);
+//            ps.executeUpdate();
+//
+//            for (int i = 0; i < words.length; i++) {
+//                query = "INSERT INTO ChangedTable2 SELECT * FROM ChangedTable WHERE AdvertisementId IN (SELECT AdvertisementId FROM ChangedTable WHERE ChangedTable.Word = ?);";
+//                ps = connection.prepareStatement(query);
+//                ps.setString(1, words[i]);
+//                ps.executeUpdate();
+//                query = "TRUNCATE ChangedTable;";
+//                ps = connection.prepareStatement(query);
+//                ps.executeUpdate();
+//                query = "INSERT INTO ChangedTable SELECT * FROM ChangedTable2;";
+//                ps = connection.prepareStatement(query);
+//                ps.executeUpdate();
+//                query = "TRUNCATE ChangedTable2;";
+//                ps = connection.prepareStatement(query);
+//                ps.executeUpdate();
+//            }
+//
+//            Array sqlArray = connection.createArrayOf("TEXT", tags);
+//            query = "SELECT * FROM (SELECT AdvertisementId, array_agg(Tag) FROM AdvertisementTags " +
+//                        "GROUP BY AdvertisementId HAVING array_agg(Tag) @> ARRAY[?]::text[]) AS Tags " +
+//                        "INNER JOIN Advertisement ON Tags.AdvertisementId = Advertisement.AdvertisementId " +
+//                    "INNER JOIN ChangedTable ON Tags.AdvertisementId = ChangedTable.AdvertisementId;";
+//            ps = connection.prepareStatement(query);
+//            ps.setArray(1, sqlArray);
+//            result = ps.executeQuery();
+//
+//            HashMap<Integer, String> resultMap = new HashMap<>();
+//            System.out.println(resultMap);
+//            while (result.next()) {
+//                    Integer id = result.getInt(1);
+//                    String title = result.getString(5);
+////                    String description = result.getString(6);
+////                    String price = result.getString(7);
+////                    String contacts = result.getString(8);
+//
+//                    if (advertisementId != 0 && !(id.equals(advertisementId))) {
+//                        continue;
+//                    }
+//                    resultMap.put(id, title);
+//                }
+//            System.out.println(resultMap);
+//            return resultMap;
+//
+//        } catch(SQLException e){
+//            throw new DefaultException("ServerError");
+//        }
+//    }
 
 
     public boolean register(String nickname, String mailAddress, String password) {
@@ -220,7 +341,29 @@ public class HeliosBdManager implements BdManager {
                 } catch (SQLException e) {
                     if (e.getSQLState().equals("23505")) {
                     } else {
-                        throw new DefaultException("ServerError");
+                        throw new RuntimeException(e);
+//                        throw new DefaultException("ServerError");
+                    }
+                }
+            }
+
+            query = "INSERT INTO CountedWordToAdvertisement VALUES (?, ?, ?);";
+            ps = connection.prepareStatement(query);
+            adWords = String.join(" ", Arrays.asList(((advertisement.title + " " + advertisement.description).toLowerCase()).split("\n"))).split(" ");
+            for (String el: adWords) {
+                System.out.println(el.toLowerCase());
+                System.out.println(advertisementId);
+                System.out.println(Collections.frequency(List.of(adWords), el));
+                ps.setInt(1, advertisementId);
+                ps.setString(2, el.toLowerCase());
+                ps.setInt(3, (int) Collections.frequency(List.of(adWords), el));
+                try {
+                    ps.execute();
+                } catch (SQLException e) {
+                    if (e.getSQLState().equals("23505")) {
+                    } else {
+                        throw new RuntimeException(e);
+//                        throw new DefaultException("ServerError");
                     }
                 }
             }

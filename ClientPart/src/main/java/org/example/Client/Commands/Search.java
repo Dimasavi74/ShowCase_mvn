@@ -8,6 +8,7 @@ import org.example.Common.ServerCommands.ServerSearch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Search implements Command{
     private Outputer outputer;
@@ -26,7 +27,7 @@ public class Search implements Command{
     public void execute() {
         try {
             ServerSearch searchCommand = (ServerSearch) communicator.executeCommand(new ServerSearch(words, tags, advertisementId));
-            HashMap<Integer, String> result = searchCommand.searchResult;
+            Map<Integer, String> result = searchCommand.searchResult;
             if (result.isEmpty()) {
                 outputer.outputLine("По вашему запросу ничего не найдено!");
             } else {
