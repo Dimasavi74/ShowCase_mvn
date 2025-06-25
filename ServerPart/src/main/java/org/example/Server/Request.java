@@ -20,11 +20,13 @@ public class Request implements Runnable {
     private final int reqNumber;
     private final SelectionKey key;
     private Set<SelectionKey> blockedKeys;
+    private HeliosBdManager bdManager;
 
-    public Request(int reqNum, SelectionKey k, Set<SelectionKey> bl) {
+    public Request(int reqNum, SelectionKey k, Set<SelectionKey> bl, HeliosBdManager bd) {
         this.reqNumber = reqNum;
         this.key = k;
         this.blockedKeys = bl;
+        this.bdManager = bd;
     }
 
     @Override
@@ -93,7 +95,7 @@ public class Request implements Runnable {
             System.out.println("Читаем объект");
             data.command = (ServerCommand) wrapper.readObject();
             System.out.println("Назначаем бд-менеджер");
-            data.command.setBdManager(new HeliosBdManager());
+            data.command.setBdManager(bdManager);
             System.out.println("Исполняем команду");
             data.command.execute();
             if (!data.command.getError().equals("")) {

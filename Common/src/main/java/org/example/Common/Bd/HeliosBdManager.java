@@ -21,27 +21,31 @@ public class HeliosBdManager implements BdManager {
     String url;
     Properties info;
     Connection connection;
+    String user;
+    String password;
 
-    public HeliosBdManager() throws IOException {
+    public HeliosBdManager(String usr, String pwd) {
 //        -L <local-address>:<local-port>:<remote-address>:<remote-port>
 //        ssh -L 5432:pg:5432 -p 2222 s467318@se.ifmo.ru
 
 
 
         url = "jdbc:postgresql://localhost:5432/studs";
-        info = new Properties();
+        user = usr;
+        password = pwd;
+//        info = new Properties();
 //        File file = new File("src/main/java/org/example/Bd/db.cfg");
 
 //        File file = new File("C:\\Users\\Dimasavi74\\IdeaProjects\\ShowCase_mvn\\src\\main\\java\\org\\example\\Bd\\db.cfg");
-        File file = new File("Common/src/main/java/org/example/Common/Bd/db.cfg");
-        info.load(new FileInputStream(file));
+//        File file = new File("org/example/Common/Bd/db.cfg");
+//        info.load(new FileInputStream(file));
 
         connect();
     }
 
     public void connect() {
         try {
-            connection = DriverManager.getConnection(url, info);
+            connection = DriverManager.getConnection(url, user, password);
         }
         catch (SQLException e) {
             if (e.getSQLState().equals("08001")) {

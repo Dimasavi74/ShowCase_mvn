@@ -1,5 +1,7 @@
 package org.example.Server;
 
+import org.example.Common.Bd.HeliosBdManager;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ClosedChannelException;
@@ -15,12 +17,14 @@ public class StandartServerCommunicator implements ServerCommunicator {
     Selector selector;
     ExecutorService executorService;
     Set<SelectionKey> blockedKeys = new HashSet<>();
+    HeliosBdManager bdManager;
 
 
     Integer counter = 0;
 
-    public StandartServerCommunicator(ExecutorService exe) {
+    public StandartServerCommunicator(ExecutorService exe, HeliosBdManager bd) {
         executorService = exe;
+        bdManager = bd;
         ServerSocketChannel server = null;
         try {
             selector = Selector.open();
@@ -51,7 +55,7 @@ public class StandartServerCommunicator implements ServerCommunicator {
             throw new RuntimeException(e);
         }
         Set<SelectionKey> keys = selector.selectedKeys();
-        System.out.println("Эти ключи нашел селектор:");
+//        System.out.println("Эти ключи нашел селектор:");
         Set<Request> requests = new HashSet<>();
         for (var iter = keys.iterator(); iter.hasNext(); ) {
             SelectionKey key = iter.next();
@@ -61,7 +65,7 @@ public class StandartServerCommunicator implements ServerCommunicator {
             }
             System.out.println(key + " isAcceptable: " + key.isAcceptable() + " isReadable: " + key.isReadable() + " isWriteable: " + key.isWritable());
             iter.remove();
-            Request request = new Request(counter++, key, blockedKeys);
+            Request request = new Request(counter++, key, blockedKeys, bdManager);
             System.out.println("Создан новый Request " + (counter - 1));
             executorService.execute(request);
             requests.add(request);
